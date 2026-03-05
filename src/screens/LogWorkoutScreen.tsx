@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  ScrollView, SafeAreaView, Alert,
+  ScrollView, SafeAreaView,
 } from 'react-native';
+import { alert } from '../utils/alert';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ExploreStackParamList } from '../navigation/types';
 import { useUserData } from '../contexts/UserDataContext';
@@ -41,7 +42,7 @@ export default function LogWorkoutScreen({ route, navigation }: Props) {
   async function handleSave() {
     const hasData = sets.some((s) => s.weight || s.reps);
     if (!hasData) {
-      Alert.alert('Add some data', 'Please enter at least weight or reps for one set.');
+      alert('Add some data', 'Please enter at least weight or reps for one set.');
       return;
     }
     setSaving(true);

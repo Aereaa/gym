@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, SafeAreaView,
-  TouchableOpacity, Alert,
+  TouchableOpacity,
 } from 'react-native';
+import { alert } from '../utils/alert';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from '../navigation/types';
 import { useUserData } from '../contexts/UserDataContext';
@@ -71,7 +72,7 @@ export default function ProgressScreen({ route }: Props) {
   const chronological = [...logs].reverse(); // oldest first for chart
 
   function handleDelete(log: WorkoutLog) {
-    Alert.alert('Delete this log?', `${new Date(log.date).toLocaleDateString()}`, [
+    alert('Delete this log?', `${new Date(log.date).toLocaleDateString()}`, [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Delete', style: 'destructive', onPress: () => deleteLog(log.id) },
     ]);

@@ -1,8 +1,9 @@
 import React from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  SafeAreaView, Alert,
+  SafeAreaView,
 } from 'react-native';
+import { alert } from '../utils/alert';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from '../navigation/types';
 import { useAuth } from '../contexts/AuthContext';
@@ -42,7 +43,7 @@ export default function ProfileScreen({ navigation }: Props) {
   const trackedExercises = Array.from(exerciseMap.entries()).slice(0, 5);
 
   function handleLogout() {
-    Alert.alert('Log out', 'Are you sure?', [
+    alert('Log out', 'Are you sure?', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Log out', style: 'destructive', onPress: () => logout() },
     ]);

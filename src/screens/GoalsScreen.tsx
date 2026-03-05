@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  FlatList, SafeAreaView, Alert,
+  FlatList, SafeAreaView,
 } from 'react-native';
+import { alert } from '../utils/alert';
 import { useUserData } from '../contexts/UserDataContext';
 import { Goal } from '../data/types';
 import { Colors, Typography, Spacing, BorderRadius } from '../theme';
@@ -53,7 +54,7 @@ export default function GoalsScreen() {
   }
 
   function handleDelete(goal: Goal) {
-    Alert.alert('Delete goal?', `"${goal.title}"`, [
+    alert('Delete goal?', `"${goal.title}"`, [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Delete', style: 'destructive', onPress: () => deleteGoal(goal.id) },
     ]);
