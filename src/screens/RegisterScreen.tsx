@@ -4,11 +4,11 @@ import {
   SafeAreaView, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { AuthStackParamList } from '../navigation/types';
+import { ProfileStackParamList } from '../navigation/types';
 import { useAuth } from '../contexts/AuthContext';
 import { Colors, Typography, Spacing, BorderRadius } from '../theme';
 
-type Props = NativeStackScreenProps<AuthStackParamList, 'Register'>;
+type Props = NativeStackScreenProps<ProfileStackParamList, 'Register'>;
 
 export default function RegisterScreen({ navigation }: Props) {
   const { register } = useAuth();
@@ -31,8 +31,11 @@ export default function RegisterScreen({ navigation }: Props) {
     setError('');
     const result = await register(name.trim(), email.trim(), password);
     setLoading(false);
-    if (result.error) setError(result.error);
-    // On success, AppNavigator automatically redirects to GymSelect
+    if (result.error) {
+      setError(result.error);
+    } else {
+      navigation.popToTop();
+    }
   }
 
   return (

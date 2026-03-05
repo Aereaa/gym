@@ -14,7 +14,7 @@ import { Colors, Typography, Spacing, BorderRadius } from '../theme';
 type Props = NativeStackScreenProps<ProfileStackParamList, 'ProfileHome'>;
 
 export default function ProfileScreen({ navigation }: Props) {
-  const { user, logout } = useAuth();
+  const { user, logout, isGuest } = useAuth();
   const { savedMachineIds, goals, workoutLogs } = useUserData();
 
   const gym = user?.gymId ? gyms.find((g) => g.id === user.gymId) : null;
@@ -54,21 +54,41 @@ export default function ProfileScreen({ navigation }: Props) {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.title}>Profile</Text>
-          <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
-            <Text style={styles.logoutText}>Log out</Text>
-          </TouchableOpacity>
+          {!isGuest && (
+            <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
+              <Text style={styles.logoutText}>Log out</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
-        <View style={styles.avatarSection}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarLetter}>{user?.name?.[0]?.toUpperCase() ?? '?'}</Text>
+        {isGuest ? (
+          <View style={styles.guestSection}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarLetter}>?</Text>
+            </View>
+            <Text style={styles.guestTitle}>You're browsing as a guest</Text>
+            <Text style={styles.guestSubtitle}>Log in or create an account to save your progress.</Text>
+            <View style={styles.guestButtons}>
+              <TouchableOpacity style={styles.guestLoginBtn} onPress={() => navigation.navigate('Login')}>
+                <Text style={styles.guestLoginText}>Log in</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.guestRegisterBtn} onPress={() => navigation.navigate('Register')}>
+                <Text style={styles.guestRegisterText}>Sign up</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          <View>
-            <Text style={styles.userName}>{user?.name}</Text>
-            <Text style={styles.userEmail}>{user?.email}</Text>
-            {gym && <Text style={styles.userGym}>🏋️  {gym.name}</Text>}
+        ) : (
+          <View style={styles.avatarSection}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarLetter}>{user?.name?.[0]?.toUpperCase() ?? '?'}</Text>
+            </View>
+            <View>
+              <Text style={styles.userName}>{user?.name}</Text>
+              <Text style={styles.userEmail}>{user?.email}</Text>
+              {gym && <Text style={styles.userGym}>🏋️  {gym.name}</Text>}
+            </View>
           </View>
-        </View>
+        )}
 
         <View style={styles.statsRow}>
           {[
@@ -203,4 +223,29 @@ const styles = StyleSheet.create({
   },
   encourageEmoji: { fontSize: 24 },
   encourageText: { ...Typography.bodySmall, color: Colors.accent, flex: 1, fontWeight: '500' },
+  guestSection: {
+    alignItems: 'center',
+    padding: Spacing.lg,
+    backgroundColor: Colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  guestTitle: { ...Typography.h3, color: Colors.textPrimary, marginTop: Spacing.md },
+  guestSubtitle: { ...Typography.body, color: Colors.textSecondary, textAlign: 'center', marginTop: Spacing.xs, maxWidth: 280 },
+  guestButtons: { flexDirection: 'row', gap: Spacing.sm, marginTop: Spacing.lg },
+  guestLoginBtn: {
+    backgroundColor: Colors.primary,
+    borderRadius: BorderRadius.md,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+  },
+  guestLoginText: { ...Typography.button, color: Colors.textOnPrimary },
+  guestRegisterBtn: {
+    borderRadius: BorderRadius.md,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    borderWidth: 1,
+    borderColor: Colors.primary,
+  },
+  guestRegisterText: { ...Typography.button, color: Colors.primary },
 });

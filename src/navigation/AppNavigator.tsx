@@ -5,7 +5,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from './types';
 import GymSelectScreen from '../screens/GymSelectScreen';
 import MainTabs from './MainTabs';
-import AuthStack from './AuthStack';
 import { useAuth } from '../contexts/AuthContext';
 import { Colors } from '../theme';
 
@@ -20,24 +19,15 @@ function LoadingScreen() {
 }
 
 export default function AppNavigator() {
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
 
   if (loading) return <LoadingScreen />;
 
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {!user ? (
-          <Stack.Screen name="Auth" component={AuthStack} />
-        ) : (
-          <>
-            {!user.gymId && (
-              <Stack.Screen name="GymSelect" component={GymSelectScreen} />
-            )}
-            <Stack.Screen name="MainTabs" component={MainTabs} />
-            <Stack.Screen name="GymSelect" component={GymSelectScreen} />
-          </>
-        )}
+        <Stack.Screen name="MainTabs" component={MainTabs} />
+        <Stack.Screen name="GymSelect" component={GymSelectScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

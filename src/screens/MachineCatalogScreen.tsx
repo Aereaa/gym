@@ -11,6 +11,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ExploreStackParamList } from '../navigation/types';
 import { gyms, machines } from '../data';
 import { Machine } from '../data/types';
+import { useAuth } from '../contexts/AuthContext';
 import { Colors, Typography, Spacing, BorderRadius } from '../theme';
 
 type Props = NativeStackScreenProps<ExploreStackParamList, 'MachineCatalog'>;
@@ -36,7 +37,8 @@ type CategoryFilter = 'all' | Machine['category'];
 const FILTERS: CategoryFilter[] = ['all', 'cardio', 'strength', 'cable', 'free-weights', 'bodyweight'];
 
 export default function MachineCatalogScreen({ route, navigation }: Props) {
-  const { gymId } = route.params;
+  const { user } = useAuth();
+  const gymId = route.params?.gymId ?? user?.gymId ?? gyms[0]?.id;
   const gym = gyms.find((g) => g.id === gymId);
   const [activeFilter, setActiveFilter] = useState<CategoryFilter>('all');
 

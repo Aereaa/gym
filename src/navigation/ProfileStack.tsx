@@ -2,6 +2,8 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from './types';
 import ProfileScreen from '../screens/ProfileScreen';
+import LoginScreen from '../screens/LoginScreen';
+import RegisterScreen from '../screens/RegisterScreen';
 import MyMachinesScreen from '../screens/MyMachinesScreen';
 import MachineDetailScreen from '../screens/MachineDetailScreen';
 import ExerciseDetailScreen from '../screens/ExerciseDetailScreen';
@@ -23,6 +25,8 @@ export default function ProfileStack() {
       }}
     >
       <Stack.Screen name="ProfileHome" component={ProfileScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Log in' }} />
+      <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Sign up' }} />
       <Stack.Screen name="MyMachines" component={MyMachinesScreen} options={{ title: 'My Machines' }} />
       <Stack.Screen name="MachineDetail" component={MachineDetailScreen} options={{ title: 'Machine' }} />
       <Stack.Screen name="ExerciseDetail" component={ExerciseDetailScreen} options={{ title: 'Exercise' }} />

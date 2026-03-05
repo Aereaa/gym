@@ -1,14 +1,8 @@
 import { NavigatorScreenParams } from '@react-navigation/native';
 
 export type RootStackParamList = {
-  Auth: NavigatorScreenParams<AuthStackParamList>;
   GymSelect: { afterAuth?: boolean };
   MainTabs: NavigatorScreenParams<MainTabParamList>;
-};
-
-export type AuthStackParamList = {
-  Login: undefined;
-  Register: undefined;
 };
 
 export type MainTabParamList = {
@@ -19,7 +13,7 @@ export type MainTabParamList = {
 };
 
 export type ExploreStackParamList = {
-  MachineCatalog: { gymId: string };
+  MachineCatalog: { gymId?: string };
   MachineDetail: { machineId: string; gymId?: string };
   ExerciseDetail: { exerciseId: string };
   LogWorkout: { exerciseId: string; exerciseName: string; machineName: string };
@@ -34,6 +28,8 @@ export type SearchStackParamList = {
 
 export type ProfileStackParamList = {
   ProfileHome: undefined;
+  Login: undefined;
+  Register: undefined;
   MyMachines: undefined;
   MachineDetail: { machineId: string; gymId?: string };
   ExerciseDetail: { exerciseId: string };
