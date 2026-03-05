@@ -8,7 +8,6 @@ export type RootStackParamList = {
 export type MainTabParamList = {
   Explore: NavigatorScreenParams<ExploreStackParamList>;
   Search: NavigatorScreenParams<SearchStackParamList>;
-  Goals: undefined;
   Profile: NavigatorScreenParams<ProfileStackParamList>;
 };
 
@@ -30,6 +29,7 @@ export type ProfileStackParamList = {
   ProfileHome: undefined;
   Login: undefined;
   Register: undefined;
+  Goals: undefined;
   MyMachines: undefined;
   MachineDetail: { machineId: string; gymId?: string };
   ExerciseDetail: { exerciseId: string };

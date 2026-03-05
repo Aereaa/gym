@@ -10,7 +10,7 @@ import {
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ExploreStackParamList } from '../navigation/types';
 import { exercises, machines } from '../data';
-import { Colors, Typography, Spacing, BorderRadius } from '../theme';
+import { Colors, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
 import MuscleMap from '../components/MuscleMap';
 import StepCard from '../components/StepCard';
 import KeyPointCard from '../components/KeyPointCard';
@@ -215,6 +215,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   hero: {
+    ...PageContainer,
     backgroundColor: Colors.surface,
   },
   videoPlaceholder: {
@@ -302,6 +303,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   sectionTabs: {
+    ...PageContainer,
     backgroundColor: Colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
@@ -329,6 +331,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   sectionContent: {
+    ...PageContainer,
     padding: Spacing.md,
     paddingBottom: Spacing.xxl,
   },

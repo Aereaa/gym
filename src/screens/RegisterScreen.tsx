@@ -6,7 +6,7 @@ import {
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from '../navigation/types';
 import { useAuth } from '../contexts/AuthContext';
-import { Colors, Typography, Spacing, BorderRadius } from '../theme';
+import { Colors, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Register'>;
 
@@ -119,7 +119,7 @@ export default function RegisterScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
-  scroll: { flexGrow: 1, paddingHorizontal: Spacing.lg, paddingBottom: Spacing.xxl },
+  scroll: { ...PageContainer, flexGrow: 1, paddingHorizontal: Spacing.lg, paddingBottom: Spacing.xxl },
   hero: { alignItems: 'center', paddingTop: Spacing.xxl, paddingBottom: Spacing.xl },
   logo: { fontSize: 56, marginBottom: Spacing.md },
   title: { ...Typography.h1, color: Colors.textPrimary, textAlign: 'center' },

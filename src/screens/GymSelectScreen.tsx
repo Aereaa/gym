@@ -13,7 +13,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { gyms } from '../data';
 import { Gym } from '../data/types';
-import { Colors, Typography, Spacing, BorderRadius } from '../theme';
+import { Colors, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
 import { useAuth } from '../contexts/AuthContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'GymSelect'>;
@@ -108,6 +108,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   hero: {
+    ...PageContainer,
     alignItems: 'center',
     paddingTop: Spacing.xl,
     paddingBottom: Spacing.lg,
@@ -129,10 +130,10 @@ const styles = StyleSheet.create({
     maxWidth: 300,
   },
   searchWrapper: {
+    ...PageContainer,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.surface,
-    marginHorizontal: Spacing.md,
     marginBottom: Spacing.md,
     borderRadius: BorderRadius.md,
     borderWidth: 1,
@@ -150,6 +151,7 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   list: {
+    ...PageContainer,
     paddingHorizontal: Spacing.md,
     paddingBottom: Spacing.xl,
   },

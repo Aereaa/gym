@@ -6,7 +6,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from '../navigation/types';
 import { machines } from '../data';
 import { useUserData } from '../contexts/UserDataContext';
-import { Colors, Typography, Spacing, BorderRadius } from '../theme';
+import { Colors, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'MyMachines'>;
 
@@ -66,7 +66,7 @@ export default function MyMachinesScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
-  list: { padding: Spacing.md, paddingBottom: Spacing.xxl },
+  list: { ...PageContainer, padding: Spacing.md, paddingBottom: Spacing.xxl },
   card: {
     backgroundColor: Colors.surface,
     borderRadius: BorderRadius.md,

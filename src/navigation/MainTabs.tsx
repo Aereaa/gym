@@ -4,7 +4,6 @@ import { Text } from 'react-native';
 import { MainTabParamList } from './types';
 import ExploreStack from './ExploreStack';
 import SearchStack from './SearchStack';
-import GoalsScreen from '../screens/GoalsScreen';
 import ProfileStack from './ProfileStack';
 import { Colors } from '../theme';
 
@@ -13,7 +12,6 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 const ICONS: Record<string, string> = {
   Explore: '🏋️',
   Search: '🔍',
-  Goals: '🎯',
   Profile: '👤',
 };
 
@@ -44,7 +42,6 @@ export default function MainTabs() {
     >
       <Tab.Screen name="Explore" component={ExploreStack} options={{ title: 'My Gym' }} />
       <Tab.Screen name="Search" component={SearchStack} options={{ title: 'Discover' }} />
-      <Tab.Screen name="Goals" component={GoalsScreen} options={{ title: 'Goals' }} />
       <Tab.Screen name="Profile" component={ProfileStack} options={{ title: 'Profile' }} />
     </Tab.Navigator>
   );

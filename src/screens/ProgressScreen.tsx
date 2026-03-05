@@ -9,7 +9,7 @@ import { ProfileStackParamList } from '../navigation/types';
 import { useUserData } from '../contexts/UserDataContext';
 import { WorkoutLog } from '../data/types';
 import ProgressChart from '../components/ProgressChart';
-import { Colors, Typography, Spacing, BorderRadius } from '../theme';
+import { Colors, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Progress'>;
 
@@ -161,7 +161,7 @@ export default function ProgressScreen({ route }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
-  scroll: { padding: Spacing.md, paddingBottom: Spacing.xxl },
+  scroll: { ...PageContainer, padding: Spacing.md, paddingBottom: Spacing.xxl },
   exerciseName: { ...Typography.h2, color: Colors.textPrimary, marginBottom: 4 },
   sessionCount: { ...Typography.bodySmall, color: Colors.textSecondary, marginBottom: Spacing.lg },
   toggle: {

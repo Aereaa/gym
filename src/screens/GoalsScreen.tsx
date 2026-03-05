@@ -6,7 +6,7 @@ import {
 import { alert } from '../utils/alert';
 import { useUserData } from '../contexts/UserDataContext';
 import { Goal } from '../data/types';
-import { Colors, Typography, Spacing, BorderRadius } from '../theme';
+import { Colors, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
 
 function GoalItem({
   goal,
@@ -126,6 +126,7 @@ export default function GoalsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   header: {
+    ...PageContainer,
     paddingHorizontal: Spacing.md,
     paddingTop: Spacing.lg,
     paddingBottom: Spacing.md,
@@ -133,8 +134,9 @@ const styles = StyleSheet.create({
   title: { ...Typography.h2, color: Colors.textPrimary },
   subtitle: { ...Typography.bodySmall, color: Colors.textSecondary, marginTop: 4 },
   addRow: {
+    ...PageContainer,
     flexDirection: 'row',
-    marginHorizontal: Spacing.md,
+    paddingHorizontal: Spacing.md,
     marginBottom: Spacing.md,
     gap: Spacing.sm,
   },
@@ -158,7 +160,7 @@ const styles = StyleSheet.create({
   },
   addBtnDisabled: { opacity: 0.4 },
   addBtnText: { ...Typography.button, color: Colors.textOnPrimary },
-  list: { paddingHorizontal: Spacing.md, paddingBottom: Spacing.xxl },
+  list: { ...PageContainer, paddingHorizontal: Spacing.md, paddingBottom: Spacing.xxl },
   sectionLabel: {
     ...Typography.label,
     color: Colors.textSecondary,

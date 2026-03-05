@@ -10,7 +10,7 @@ import {
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ExploreStackParamList } from '../navigation/types';
 import { machines, exercises } from '../data';
-import { Colors, Typography, Spacing, BorderRadius } from '../theme';
+import { Colors, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
 import ExerciseCard from '../components/ExerciseCard';
 import SetupStepList from '../components/SetupStepList';
 import EtiquetteList from '../components/EtiquetteList';
@@ -108,6 +108,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   hero: {
+    ...PageContainer,
     alignItems: 'center',
     padding: Spacing.lg,
     backgroundColor: Colors.surface,
@@ -139,6 +140,7 @@ const styles = StyleSheet.create({
     maxWidth: 320,
   },
   tabBar: {
+    ...PageContainer,
     flexDirection: 'row',
     backgroundColor: Colors.surface,
     borderBottomWidth: 1,
@@ -168,6 +170,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   content: {
+    ...PageContainer,
     padding: Spacing.md,
     paddingBottom: Spacing.xxl,
   },

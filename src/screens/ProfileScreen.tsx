@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, TouchableOpacity,
+  View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
 import { alert } from '../utils/alert';
@@ -9,18 +9,19 @@ import { ProfileStackParamList } from '../navigation/types';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserData } from '../contexts/UserDataContext';
 import { gyms } from '../data';
-import { Colors, Typography, Spacing, BorderRadius } from '../theme';
+import { Colors, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'ProfileHome'>;
 
 export default function ProfileScreen({ navigation }: Props) {
   const { user, logout, isGuest } = useAuth();
-  const { savedMachineIds, goals, workoutLogs } = useUserData();
+  const { savedMachineIds, goals, addGoal, toggleGoal, workoutLogs } = useUserData();
+  const [goalText, setGoalText] = useState('');
 
   const gym = user?.gymId ? gyms.find((g) => g.id === user.gymId) : null;
+  const pendingGoals = goals.filter((g) => !g.completed);
   const completedGoals = goals.filter((g) => g.completed).length;
 
-  // Build per-exercise progress summary
   const exerciseMap = new Map<string, { exerciseName: string; machineName: string; sessionCount: number; bestWeight?: number }>();
   for (const log of workoutLogs) {
     const existing = exerciseMap.get(log.exerciseId);
@@ -40,7 +41,7 @@ export default function ProfileScreen({ navigation }: Props) {
       });
     }
   }
-  const trackedExercises = Array.from(exerciseMap.entries()).slice(0, 5);
+  const trackedExercises = Array.from(exerciseMap.entries()).slice(0, 3);
 
   function handleLogout() {
     alert('Log out', 'Are you sure?', [
@@ -49,100 +50,194 @@ export default function ProfileScreen({ navigation }: Props) {
     ]);
   }
 
+  async function handleAddGoal() {
+    const trimmed = goalText.trim();
+    if (!trimmed) return;
+    await addGoal(trimmed);
+    setGoalText('');
+  }
+
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Profile</Text>
-          {!isGuest && (
-            <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
-              <Text style={styles.logoutText}>Log out</Text>
-            </TouchableOpacity>
+    <SafeAreaView style={styles.safe}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.page}>
+
+          {/* ── Header ────────────────────────────────── */}
+          <View style={styles.header}>
+            <Text style={styles.screenTitle}>Profile</Text>
+            {!isGuest && (
+              <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
+                <Text style={styles.logoutText}>Log out</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {/* ── User card ─────────────────────────────── */}
+          {isGuest ? (
+            <View style={styles.card}>
+              <View style={styles.guestInner}>
+                <View style={styles.avatarLg}>
+                  <Text style={styles.avatarLetter}>?</Text>
+                </View>
+                <Text style={styles.guestTitle}>Browsing as guest</Text>
+                <Text style={styles.guestSub}>Create an account to save your progress across sessions.</Text>
+                <View style={styles.guestBtns}>
+                  <TouchableOpacity style={styles.btnPrimary} onPress={() => navigation.navigate('Login')}>
+                    <Text style={styles.btnPrimaryText}>Log in</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.btnOutline} onPress={() => navigation.navigate('Register')}>
+                    <Text style={styles.btnOutlineText}>Sign up</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.card}>
+              <View style={styles.userRow}>
+                <View style={styles.avatarLg}>
+                  <Text style={styles.avatarLetter}>{user?.name?.[0]?.toUpperCase() ?? '?'}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.userName}>{user?.name}</Text>
+                  <Text style={styles.userMeta}>{user?.email}</Text>
+                  {gym && <Text style={styles.userGym}>{gym.name}</Text>}
+                </View>
+              </View>
+            </View>
           )}
-        </View>
 
-        {isGuest ? (
-          <View style={styles.guestSection}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarLetter}>?</Text>
+          {/* ── Stats ─────────────────────────────────── */}
+          <View style={styles.statsRow}>
+            <View style={styles.statCard}>
+              <Text style={styles.statValue}>{savedMachineIds.length}</Text>
+              <Text style={styles.statLabel}>Machines</Text>
             </View>
-            <Text style={styles.guestTitle}>You're browsing as a guest</Text>
-            <Text style={styles.guestSubtitle}>Log in or create an account to save your progress.</Text>
-            <View style={styles.guestButtons}>
-              <TouchableOpacity style={styles.guestLoginBtn} onPress={() => navigation.navigate('Login')}>
-                <Text style={styles.guestLoginText}>Log in</Text>
+            <View style={styles.statCard}>
+              <Text style={styles.statValue}>{completedGoals}/{goals.length}</Text>
+              <Text style={styles.statLabel}>Goals</Text>
+            </View>
+            <View style={styles.statCard}>
+              <Text style={styles.statValue}>{workoutLogs.length}</Text>
+              <Text style={styles.statLabel}>Sessions</Text>
+            </View>
+          </View>
+
+          {/* ── Goals ─────────────────────────────────── */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>My Goals</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Goals')}>
+                <Text style={styles.seeAll}>See all</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.guestRegisterBtn} onPress={() => navigation.navigate('Register')}>
-                <Text style={styles.guestRegisterText}>Sign up</Text>
-              </TouchableOpacity>
             </View>
-          </View>
-        ) : (
-          <View style={styles.avatarSection}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarLetter}>{user?.name?.[0]?.toUpperCase() ?? '?'}</Text>
-            </View>
-            <View>
-              <Text style={styles.userName}>{user?.name}</Text>
-              <Text style={styles.userEmail}>{user?.email}</Text>
-              {gym && <Text style={styles.userGym}>🏋️  {gym.name}</Text>}
-            </View>
-          </View>
-        )}
 
-        <View style={styles.statsRow}>
-          {[
-            { icon: '📌', value: String(savedMachineIds.length), label: 'Saved machines' },
-            { icon: '🎯', value: `${completedGoals}/${goals.length}`, label: 'Goals done' },
-            { icon: '📊', value: String(workoutLogs.length), label: 'Sessions logged' },
-          ].map((s) => (
-            <View key={s.label} style={styles.statCard}>
-              <Text style={styles.statIcon}>{s.icon}</Text>
-              <Text style={styles.statValue}>{s.value}</Text>
-              <Text style={styles.statLabel}>{s.label}</Text>
-            </View>
-          ))}
-        </View>
-
-        <TouchableOpacity style={styles.menuRow} onPress={() => navigation.navigate('MyMachines')}>
-          <Text style={styles.menuIcon}>📌</Text>
-          <View style={styles.menuInfo}>
-            <Text style={styles.menuLabel}>My Machines</Text>
-            <Text style={styles.menuMeta}>{savedMachineIds.length} saved</Text>
-          </View>
-          <Text style={styles.menuArrow}>›</Text>
-        </TouchableOpacity>
-
-        {trackedExercises.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>My Progress</Text>
-            {trackedExercises.map(([exerciseId, data]) => (
+            <View style={styles.goalInput}>
+              <TextInput
+                style={styles.goalTextInput}
+                value={goalText}
+                onChangeText={setGoalText}
+                placeholder="Add a goal — e.g. Squat 80 kg"
+                placeholderTextColor={Colors.textDisabled}
+                onSubmitEditing={handleAddGoal}
+                returnKeyType="done"
+              />
               <TouchableOpacity
-                key={exerciseId}
-                style={styles.progressRow}
-                onPress={() => navigation.navigate('Progress', { exerciseId, exerciseName: data.exerciseName })}
+                style={[styles.goalAddBtn, !goalText.trim() && { opacity: 0.4 }]}
+                onPress={handleAddGoal}
+                disabled={!goalText.trim()}
               >
-                <View style={styles.progressInfo}>
-                  <Text style={styles.progressExercise}>{data.exerciseName}</Text>
-                  <Text style={styles.progressMachine}>{data.machineName}</Text>
+                <Text style={styles.goalAddText}>+</Text>
+              </TouchableOpacity>
+            </View>
+
+            {pendingGoals.length === 0 && goals.length === 0 && (
+              <Text style={styles.emptyHint}>No goals yet. Add one above to get started.</Text>
+            )}
+
+            {pendingGoals.slice(0, 4).map((goal) => (
+              <TouchableOpacity
+                key={goal.id}
+                style={styles.goalRow}
+                onPress={() => toggleGoal(goal.id)}
+              >
+                <View style={styles.checkbox}>
+                  <View style={styles.checkboxInner} />
                 </View>
-                <View style={styles.progressStats}>
-                  <Text style={styles.progressSessions}>{data.sessionCount} session{data.sessionCount !== 1 ? 's' : ''}</Text>
-                  {data.bestWeight !== undefined && (
-                    <Text style={styles.progressBest}>Best: {data.bestWeight} kg</Text>
-                  )}
-                </View>
-                <Text style={styles.menuArrow}>›</Text>
+                <Text style={styles.goalText} numberOfLines={1}>{goal.title}</Text>
               </TouchableOpacity>
             ))}
-          </View>
-        )}
 
-        <View style={styles.encouragement}>
-          <Text style={styles.encourageEmoji}>🌟</Text>
-          <Text style={styles.encourageText}>
-            You're doing great. Every visit makes you more confident.
-          </Text>
+            {completedGoals > 0 && (
+              <Text style={styles.completedNote}>{completedGoals} goal{completedGoals !== 1 ? 's' : ''} completed</Text>
+            )}
+          </View>
+
+          {/* ── My Machines ───────────────────────────── */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>My Machines</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('MyMachines')}>
+                <Text style={styles.seeAll}>{savedMachineIds.length > 0 ? 'See all' : ''}</Text>
+              </TouchableOpacity>
+            </View>
+
+            {savedMachineIds.length === 0 ? (
+              <View style={styles.emptyCard}>
+                <Text style={styles.emptyHint}>No saved machines yet.</Text>
+                <TouchableOpacity
+                  style={styles.btnOutlineSm}
+                  onPress={() => navigation.getParent()?.navigate('Search')}
+                >
+                  <Text style={styles.btnOutlineSmText}>Browse machines</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('MyMachines')}>
+                <Text style={styles.menuIcon}>📌</Text>
+                <Text style={styles.menuText}>{savedMachineIds.length} saved machine{savedMachineIds.length !== 1 ? 's' : ''}</Text>
+                <Text style={styles.menuArrow}>›</Text>
+              </TouchableOpacity>
+            )}
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => navigation.getParent()?.navigate('Search')}
+            >
+              <Text style={styles.menuIcon}>🔍</Text>
+              <Text style={styles.menuText}>Browse & add machines</Text>
+              <Text style={styles.menuArrow}>›</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* ── Progress ──────────────────────────────── */}
+          {trackedExercises.length > 0 && (
+            <View style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardTitle}>Progress</Text>
+              </View>
+              {trackedExercises.map(([exerciseId, data]) => (
+                <TouchableOpacity
+                  key={exerciseId}
+                  style={styles.progressRow}
+                  onPress={() => navigation.navigate('Progress', { exerciseId, exerciseName: data.exerciseName })}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.progressName}>{data.exerciseName}</Text>
+                    <Text style={styles.progressMeta}>{data.machineName}</Text>
+                  </View>
+                  <View style={{ alignItems: 'flex-end' }}>
+                    <Text style={styles.progressStat}>{data.sessionCount} session{data.sessionCount !== 1 ? 's' : ''}</Text>
+                    {data.bestWeight !== undefined && (
+                      <Text style={styles.progressBest}>Best: {data.bestWeight} kg</Text>
+                    )}
+                  </View>
+                  <Text style={styles.menuArrow}>›</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+
+          <View style={{ height: Spacing.xxl }} />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -150,102 +245,104 @@ export default function ProfileScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
-  scroll: { paddingBottom: Spacing.xxl },
-  header: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: Spacing.md, paddingTop: Spacing.lg, paddingBottom: Spacing.md,
-  },
-  title: { ...Typography.h2, color: Colors.textPrimary },
-  logoutBtn: {
-    paddingVertical: Spacing.xs, paddingHorizontal: Spacing.md,
-    borderRadius: BorderRadius.full, borderWidth: 1, borderColor: Colors.border,
-  },
+  safe: { flex: 1, backgroundColor: Colors.background },
+  page: { ...PageContainer, padding: Spacing.md, paddingTop: Spacing.lg },
+
+  // Header
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: Spacing.lg },
+  screenTitle: { ...Typography.h1, color: Colors.textPrimary },
+  logoutBtn: { paddingVertical: Spacing.xs, paddingHorizontal: Spacing.md, borderRadius: BorderRadius.full, borderWidth: 1, borderColor: Colors.border },
   logoutText: { ...Typography.label, color: Colors.textSecondary },
-  avatarSection: {
-    flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: Spacing.md, paddingVertical: Spacing.lg,
-    backgroundColor: Colors.surface, borderBottomWidth: 1, borderBottomColor: Colors.border,
-    gap: Spacing.md,
+
+  // Cards
+  card: {
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.md,
+    marginBottom: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
-  avatar: {
-    width: 64, height: 64, borderRadius: 32,
+  cardHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: Spacing.md },
+  cardTitle: { ...Typography.h4, color: Colors.textPrimary },
+  seeAll: { ...Typography.label, color: Colors.primary },
+
+  // Guest
+  guestInner: { alignItems: 'center', paddingVertical: Spacing.md },
+  guestTitle: { ...Typography.h3, color: Colors.textPrimary, marginTop: Spacing.md },
+  guestSub: { ...Typography.body, color: Colors.textSecondary, textAlign: 'center', marginTop: Spacing.xs, maxWidth: 300 },
+  guestBtns: { flexDirection: 'row', gap: Spacing.sm, marginTop: Spacing.lg },
+
+  // User
+  userRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  avatarLg: {
+    width: 56, height: 56, borderRadius: 28,
     backgroundColor: Colors.primaryLight, alignItems: 'center', justifyContent: 'center',
   },
-  avatarLetter: { fontSize: 28, fontWeight: '700', color: Colors.primary },
+  avatarLetter: { fontSize: 24, fontWeight: '700', color: Colors.primary },
   userName: { ...Typography.h3, color: Colors.textPrimary },
-  userEmail: { ...Typography.bodySmall, color: Colors.textSecondary, marginTop: 2 },
-  userGym: { ...Typography.bodySmall, color: Colors.accent, marginTop: 4, fontWeight: '500' },
-  statsRow: { flexDirection: 'row', padding: Spacing.md, gap: Spacing.sm },
+  userMeta: { ...Typography.bodySmall, color: Colors.textSecondary, marginTop: 2 },
+  userGym: { ...Typography.bodySmall, color: Colors.accent, fontWeight: '500', marginTop: 2 },
+
+  // Buttons
+  btnPrimary: { backgroundColor: Colors.primary, borderRadius: BorderRadius.md, paddingVertical: 10, paddingHorizontal: Spacing.lg },
+  btnPrimaryText: { ...Typography.button, color: Colors.textOnPrimary },
+  btnOutline: { borderRadius: BorderRadius.md, paddingVertical: 10, paddingHorizontal: Spacing.lg, borderWidth: 1, borderColor: Colors.primary },
+  btnOutlineText: { ...Typography.button, color: Colors.primary },
+  btnOutlineSm: { borderRadius: BorderRadius.md, paddingVertical: Spacing.xs, paddingHorizontal: Spacing.md, borderWidth: 1, borderColor: Colors.primary, marginTop: Spacing.sm },
+  btnOutlineSmText: { ...Typography.label, color: Colors.primary },
+
+  // Stats
+  statsRow: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.md },
   statCard: {
-    flex: 1, backgroundColor: Colors.surface, borderRadius: BorderRadius.md,
-    padding: Spacing.sm, alignItems: 'center', borderWidth: 1, borderColor: Colors.border,
+    flex: 1, backgroundColor: Colors.surface, borderRadius: BorderRadius.lg,
+    paddingVertical: Spacing.md, alignItems: 'center', borderWidth: 1, borderColor: Colors.border,
   },
-  statIcon: { fontSize: 20, marginBottom: 4 },
-  statValue: { ...Typography.h4, color: Colors.primary },
-  statLabel: { ...Typography.caption, color: Colors.textSecondary, textAlign: 'center', marginTop: 2 },
-  menuRow: {
-    flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.surface,
-    marginHorizontal: Spacing.md, marginBottom: Spacing.sm,
-    padding: Spacing.md, borderRadius: BorderRadius.md, borderWidth: 1, borderColor: Colors.border,
+  statValue: { ...Typography.h2, color: Colors.primary },
+  statLabel: { ...Typography.caption, color: Colors.textSecondary, marginTop: 2, textTransform: 'uppercase', letterSpacing: 0.5 },
+
+  // Goals
+  goalInput: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.sm },
+  goalTextInput: {
+    flex: 1, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border,
+    borderRadius: BorderRadius.md, paddingHorizontal: Spacing.md, height: 44,
+    ...Typography.body, color: Colors.textPrimary,
   },
-  menuIcon: { fontSize: 22, marginRight: Spacing.md },
-  menuInfo: { flex: 1 },
-  menuLabel: { ...Typography.h4, color: Colors.textPrimary },
-  menuMeta: { ...Typography.bodySmall, color: Colors.textSecondary, marginTop: 2 },
-  menuArrow: { fontSize: 22, color: Colors.textDisabled },
-  section: {
-    marginHorizontal: Spacing.md, marginBottom: Spacing.md,
-    backgroundColor: Colors.surface, borderRadius: BorderRadius.md,
-    borderWidth: 1, borderColor: Colors.border, overflow: 'hidden',
+  goalAddBtn: {
+    width: 44, height: 44, backgroundColor: Colors.primary, borderRadius: BorderRadius.md,
+    alignItems: 'center', justifyContent: 'center',
   },
-  sectionTitle: {
-    ...Typography.label, color: Colors.textSecondary, textTransform: 'uppercase',
-    letterSpacing: 0.5, padding: Spacing.md, paddingBottom: Spacing.sm,
-    borderBottomWidth: 1, borderBottomColor: Colors.border,
+  goalAddText: { fontSize: 22, color: Colors.textOnPrimary, fontWeight: '600' },
+  goalRow: {
+    flexDirection: 'row', alignItems: 'center', paddingVertical: Spacing.sm,
+    borderTopWidth: 1, borderTopColor: Colors.border,
   },
+  checkbox: { marginRight: Spacing.sm },
+  checkboxInner: {
+    width: 22, height: 22, borderRadius: 11,
+    borderWidth: 2, borderColor: Colors.border,
+  },
+  goalText: { ...Typography.body, color: Colors.textPrimary, flex: 1 },
+  completedNote: { ...Typography.bodySmall, color: Colors.accent, marginTop: Spacing.sm, fontWeight: '500' },
+  emptyHint: { ...Typography.bodySmall, color: Colors.textSecondary, paddingVertical: Spacing.xs },
+  emptyCard: { alignItems: 'center', paddingVertical: Spacing.sm },
+
+  // Menu items
+  menuItem: {
+    flexDirection: 'row', alignItems: 'center', paddingVertical: Spacing.sm,
+    borderTopWidth: 1, borderTopColor: Colors.border,
+  },
+  menuIcon: { fontSize: 18, marginRight: Spacing.sm },
+  menuText: { ...Typography.body, color: Colors.textPrimary, flex: 1 },
+  menuArrow: { fontSize: 20, color: Colors.textDisabled, marginLeft: Spacing.sm },
+
+  // Progress
   progressRow: {
-    flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm,
-    borderBottomWidth: 1, borderBottomColor: Colors.border,
+    flexDirection: 'row', alignItems: 'center', paddingVertical: Spacing.sm,
+    borderTopWidth: 1, borderTopColor: Colors.border, gap: Spacing.sm,
   },
-  progressInfo: { flex: 1 },
-  progressExercise: { ...Typography.label, color: Colors.textPrimary },
-  progressMachine: { ...Typography.caption, color: Colors.textSecondary, marginTop: 2 },
-  progressStats: { alignItems: 'flex-end', marginRight: Spacing.sm },
-  progressSessions: { ...Typography.caption, color: Colors.textSecondary },
+  progressName: { ...Typography.label, color: Colors.textPrimary },
+  progressMeta: { ...Typography.caption, color: Colors.textSecondary, marginTop: 2 },
+  progressStat: { ...Typography.caption, color: Colors.textSecondary },
   progressBest: { ...Typography.caption, color: Colors.primary, fontWeight: '600', marginTop: 2 },
-  encouragement: {
-    flexDirection: 'row', alignItems: 'center',
-    margin: Spacing.md, marginTop: Spacing.sm,
-    backgroundColor: Colors.accentLight, borderRadius: BorderRadius.md,
-    padding: Spacing.md, gap: Spacing.sm,
-  },
-  encourageEmoji: { fontSize: 24 },
-  encourageText: { ...Typography.bodySmall, color: Colors.accent, flex: 1, fontWeight: '500' },
-  guestSection: {
-    alignItems: 'center',
-    padding: Spacing.lg,
-    backgroundColor: Colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-  },
-  guestTitle: { ...Typography.h3, color: Colors.textPrimary, marginTop: Spacing.md },
-  guestSubtitle: { ...Typography.body, color: Colors.textSecondary, textAlign: 'center', marginTop: Spacing.xs, maxWidth: 280 },
-  guestButtons: { flexDirection: 'row', gap: Spacing.sm, marginTop: Spacing.lg },
-  guestLoginBtn: {
-    backgroundColor: Colors.primary,
-    borderRadius: BorderRadius.md,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.lg,
-  },
-  guestLoginText: { ...Typography.button, color: Colors.textOnPrimary },
-  guestRegisterBtn: {
-    borderRadius: BorderRadius.md,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.lg,
-    borderWidth: 1,
-    borderColor: Colors.primary,
-  },
-  guestRegisterText: { ...Typography.button, color: Colors.primary },
 });

@@ -1,3 +1,5 @@
+import { ViewStyle } from 'react-native';
+
 export { Colors } from './colors';
 export { Typography } from './typography';
 
@@ -17,3 +19,10 @@ export const BorderRadius = {
   xl: 24,
   full: 9999,
 } as const;
+
+/** Centered max-width wrapper for responsive desktop layout */
+export const PageContainer: ViewStyle = {
+  maxWidth: 640,
+  width: '100%',
+  alignSelf: 'center',
+};

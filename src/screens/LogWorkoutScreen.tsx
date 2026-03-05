@@ -8,7 +8,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ExploreStackParamList } from '../navigation/types';
 import { useUserData } from '../contexts/UserDataContext';
 import { WorkoutSet } from '../data/types';
-import { Colors, Typography, Spacing, BorderRadius } from '../theme';
+import { Colors, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
 
 type Props = NativeStackScreenProps<ExploreStackParamList, 'LogWorkout'>;
 
@@ -140,7 +140,7 @@ export default function LogWorkoutScreen({ route, navigation }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
-  scroll: { padding: Spacing.md, paddingBottom: Spacing.xxl },
+  scroll: { ...PageContainer, padding: Spacing.md, paddingBottom: Spacing.xxl },
   exerciseInfo: {
     backgroundColor: Colors.surface,
     borderRadius: BorderRadius.md,
