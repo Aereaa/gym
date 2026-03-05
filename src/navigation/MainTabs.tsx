@@ -3,19 +3,24 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text } from 'react-native';
 import { MainTabParamList } from './types';
 import ExploreStack from './ExploreStack';
-import ProfileScreen from '../screens/ProfileScreen';
+import SearchStack from './SearchStack';
+import GoalsScreen from '../screens/GoalsScreen';
+import ProfileStack from './ProfileStack';
 import { Colors } from '../theme';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
+const ICONS: Record<string, string> = {
+  Explore: '🏋️',
+  Search: '🔍',
+  Goals: '🎯',
+  Profile: '👤',
+};
+
 function TabIcon({ label, focused }: { label: string; focused: boolean }) {
-  const icons: Record<string, string> = {
-    Explore: '🏋️',
-    Profile: '👤',
-  };
   return (
     <Text style={{ fontSize: focused ? 22 : 20, opacity: focused ? 1 : 0.6 }}>
-      {icons[label] ?? '●'}
+      {ICONS[label] ?? '●'}
     </Text>
   );
 }
@@ -25,9 +30,7 @@ export default function MainTabs() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarIcon: ({ focused }) => (
-          <TabIcon label={route.name} focused={focused} />
-        ),
+        tabBarIcon: ({ focused }) => <TabIcon label={route.name} focused={focused} />,
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.textSecondary,
         tabBarStyle: {
@@ -36,19 +39,13 @@ export default function MainTabs() {
           paddingBottom: 4,
           height: 60,
         },
-        tabBarLabelStyle: { fontSize: 12, fontWeight: '500' },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '500' },
       })}
     >
-      <Tab.Screen
-        name="Explore"
-        component={ExploreStack}
-        options={{ title: 'My Gym' }}
-      />
-      <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{ title: 'Profile' }}
-      />
+      <Tab.Screen name="Explore" component={ExploreStack} options={{ title: 'My Gym' }} />
+      <Tab.Screen name="Search" component={SearchStack} options={{ title: 'Discover' }} />
+      <Tab.Screen name="Goals" component={GoalsScreen} options={{ title: 'Goals' }} />
+      <Tab.Screen name="Profile" component={ProfileStack} options={{ title: 'Profile' }} />
     </Tab.Navigator>
   );
 }

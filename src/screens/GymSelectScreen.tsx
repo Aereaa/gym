@@ -14,10 +14,12 @@ import { RootStackParamList } from '../navigation/types';
 import { gyms } from '../data';
 import { Gym } from '../data/types';
 import { Colors, Typography, Spacing, BorderRadius } from '../theme';
+import { useAuth } from '../contexts/AuthContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'GymSelect'>;
 
 export default function GymSelectScreen({ navigation }: Props) {
+  const { updateUser } = useAuth();
   const [query, setQuery] = useState('');
 
   const filtered = gyms.filter(
@@ -26,7 +28,8 @@ export default function GymSelectScreen({ navigation }: Props) {
       g.city.toLowerCase().includes(query.toLowerCase()),
   );
 
-  const handleSelect = (gym: Gym) => {
+  const handleSelect = async (gym: Gym) => {
+    await updateUser({ gymId: gym.id });
     navigation.replace('MainTabs', {
       screen: 'Explore',
       params: {

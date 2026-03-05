@@ -9,22 +9,24 @@ import {
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ExploreStackParamList } from '../navigation/types';
-import { exercises } from '../data';
+import { exercises, machines } from '../data';
 import { Colors, Typography, Spacing, BorderRadius } from '../theme';
 import MuscleMap from '../components/MuscleMap';
 import StepCard from '../components/StepCard';
 import KeyPointCard from '../components/KeyPointCard';
 import MistakeCard from '../components/MistakeCard';
 import DifficultyBadge from '../components/DifficultyBadge';
+import { useUserData } from '../contexts/UserDataContext';
 
 type Props = NativeStackScreenProps<ExploreStackParamList, 'ExerciseDetail'>;
 
 type Section = 'how-to' | 'muscles' | 'tips' | 'mistakes';
 
-export default function ExerciseDetailScreen({ route }: Props) {
+export default function ExerciseDetailScreen({ route, navigation }: Props) {
   const { exerciseId } = route.params;
   const exercise = exercises.find((e) => e.id === exerciseId);
   const [activeSection, setActiveSection] = useState<Section>('how-to');
+  const { isMachineSaved, saveMachine, removeSavedMachine } = useUserData();
 
   if (!exercise) {
     return (
@@ -32,6 +34,15 @@ export default function ExerciseDetailScreen({ route }: Props) {
         <Text style={styles.errorText}>Exercise not found</Text>
       </SafeAreaView>
     );
+  }
+
+  const machine = machines.find((m) => m.id === exercise.machineId);
+  const machineSaved = machine ? isMachineSaved(machine.id) : false;
+
+  function toggleMachineSave() {
+    if (!machine) return;
+    if (machineSaved) removeSavedMachine(machine.id);
+    else saveMachine(machine.id);
   }
 
   const sections: { key: Section; label: string }[] = [
@@ -80,6 +91,31 @@ export default function ExerciseDetailScreen({ route }: Props) {
                 )}
               </View>
             )}
+
+            {/* Action buttons */}
+            <View style={styles.actionRow}>
+              <TouchableOpacity
+                style={styles.logBtn}
+                onPress={() =>
+                  navigation.navigate('LogWorkout', {
+                    exerciseId: exercise.id,
+                    exerciseName: exercise.name,
+                    machineName: machine?.name ?? 'Machine',
+                  })
+                }
+              >
+                <Text style={styles.logBtnText}>📊  Log workout</Text>
+              </TouchableOpacity>
+
+              {machine && (
+                <TouchableOpacity
+                  style={[styles.saveBtn, machineSaved && styles.saveBtnActive]}
+                  onPress={toggleMachineSave}
+                >
+                  <Text style={styles.saveBtnText}>{machineSaved ? '🔖' : '＋'}</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         </View>
 
@@ -210,6 +246,40 @@ const styles = StyleSheet.create({
     ...Typography.body,
     color: Colors.textSecondary,
     marginBottom: Spacing.md,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    marginTop: Spacing.md,
+  },
+  logBtn: {
+    flex: 1,
+    backgroundColor: Colors.primary,
+    borderRadius: BorderRadius.md,
+    paddingVertical: Spacing.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logBtnText: {
+    ...Typography.button,
+    color: Colors.textOnPrimary,
+  },
+  saveBtn: {
+    width: 48,
+    height: 44,
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  saveBtnActive: {
+    backgroundColor: Colors.primaryLight,
+    borderColor: Colors.primary,
+  },
+  saveBtnText: {
+    fontSize: 20,
   },
   statsRow: {
     flexDirection: 'row',

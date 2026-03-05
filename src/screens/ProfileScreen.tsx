@@ -1,60 +1,125 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
+import {
+  View, Text, StyleSheet, ScrollView, TouchableOpacity,
+  SafeAreaView, Alert,
+} from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { ProfileStackParamList } from '../navigation/types';
+import { useAuth } from '../contexts/AuthContext';
+import { useUserData } from '../contexts/UserDataContext';
+import { gyms } from '../data';
 import { Colors, Typography, Spacing, BorderRadius } from '../theme';
 
-export default function ProfileScreen() {
+type Props = NativeStackScreenProps<ProfileStackParamList, 'ProfileHome'>;
+
+export default function ProfileScreen({ navigation }: Props) {
+  const { user, logout } = useAuth();
+  const { savedMachineIds, goals, workoutLogs } = useUserData();
+
+  const gym = user?.gymId ? gyms.find((g) => g.id === user.gymId) : null;
+  const completedGoals = goals.filter((g) => g.completed).length;
+
+  // Build per-exercise progress summary
+  const exerciseMap = new Map<string, { exerciseName: string; machineName: string; sessionCount: number; bestWeight?: number }>();
+  for (const log of workoutLogs) {
+    const existing = exerciseMap.get(log.exerciseId);
+    const weights = log.sets.map((s) => s.weight).filter((w): w is number => w !== undefined);
+    const maxW = weights.length > 0 ? Math.max(...weights) : undefined;
+    if (existing) {
+      existing.sessionCount += 1;
+      if (maxW !== undefined && (existing.bestWeight === undefined || maxW > existing.bestWeight)) {
+        existing.bestWeight = maxW;
+      }
+    } else {
+      exerciseMap.set(log.exerciseId, {
+        exerciseName: log.exerciseName,
+        machineName: log.machineName,
+        sessionCount: 1,
+        bestWeight: maxW,
+      });
+    }
+  }
+  const trackedExercises = Array.from(exerciseMap.entries()).slice(0, 5);
+
+  function handleLogout() {
+    Alert.alert('Log out', 'Are you sure?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Log out', style: 'destructive', onPress: () => logout() },
+    ]);
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.title}>Profile</Text>
+          <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
+            <Text style={styles.logoutText}>Log out</Text>
+          </TouchableOpacity>
         </View>
 
-        {/* Avatar */}
         <View style={styles.avatarSection}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>👤</Text>
+            <Text style={styles.avatarLetter}>{user?.name?.[0]?.toUpperCase() ?? '?'}</Text>
           </View>
-          <Text style={styles.userName}>Member</Text>
-          <Text style={styles.memberSince}>Member since 2024</Text>
+          <View>
+            <Text style={styles.userName}>{user?.name}</Text>
+            <Text style={styles.userEmail}>{user?.email}</Text>
+            {gym && <Text style={styles.userGym}>🏋️  {gym.name}</Text>}
+          </View>
         </View>
 
-        {/* Stats */}
-        <View style={styles.statsGrid}>
+        <View style={styles.statsRow}>
           {[
-            { label: 'Gyms visited', value: '1', icon: '🏟️' },
-            { label: 'Machines tried', value: '3', icon: '💪' },
-            { label: 'Exercises learned', value: '5', icon: '📚' },
-          ].map((stat) => (
-            <View key={stat.label} style={styles.statCard}>
-              <Text style={styles.statIcon}>{stat.icon}</Text>
-              <Text style={styles.statValue}>{stat.value}</Text>
-              <Text style={styles.statLabel}>{stat.label}</Text>
+            { icon: '📌', value: String(savedMachineIds.length), label: 'Saved machines' },
+            { icon: '🎯', value: `${completedGoals}/${goals.length}`, label: 'Goals done' },
+            { icon: '📊', value: String(workoutLogs.length), label: 'Sessions logged' },
+          ].map((s) => (
+            <View key={s.label} style={styles.statCard}>
+              <Text style={styles.statIcon}>{s.icon}</Text>
+              <Text style={styles.statValue}>{s.value}</Text>
+              <Text style={styles.statLabel}>{s.label}</Text>
             </View>
           ))}
         </View>
 
-        {/* Settings list */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>App settings</Text>
-          {[
-            { label: 'Language', value: 'English', icon: '🌐' },
-            { label: 'Notifications', value: 'On', icon: '🔔' },
-            { label: 'My gym', value: 'FitArena Praha', icon: '🏋️' },
-          ].map((item) => (
-            <TouchableOpacity key={item.label} style={styles.settingRow}>
-              <Text style={styles.settingIcon}>{item.icon}</Text>
-              <Text style={styles.settingLabel}>{item.label}</Text>
-              <Text style={styles.settingValue}>{item.value}</Text>
-              <Text style={styles.settingArrow}>›</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        <TouchableOpacity style={styles.menuRow} onPress={() => navigation.navigate('MyMachines')}>
+          <Text style={styles.menuIcon}>📌</Text>
+          <View style={styles.menuInfo}>
+            <Text style={styles.menuLabel}>My Machines</Text>
+            <Text style={styles.menuMeta}>{savedMachineIds.length} saved</Text>
+          </View>
+          <Text style={styles.menuArrow}>›</Text>
+        </TouchableOpacity>
 
-        {/* Confidence message */}
+        {trackedExercises.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>My Progress</Text>
+            {trackedExercises.map(([exerciseId, data]) => (
+              <TouchableOpacity
+                key={exerciseId}
+                style={styles.progressRow}
+                onPress={() => navigation.navigate('Progress', { exerciseId, exerciseName: data.exerciseName })}
+              >
+                <View style={styles.progressInfo}>
+                  <Text style={styles.progressExercise}>{data.exerciseName}</Text>
+                  <Text style={styles.progressMachine}>{data.machineName}</Text>
+                </View>
+                <View style={styles.progressStats}>
+                  <Text style={styles.progressSessions}>{data.sessionCount} session{data.sessionCount !== 1 ? 's' : ''}</Text>
+                  {data.bestWeight !== undefined && (
+                    <Text style={styles.progressBest}>Best: {data.bestWeight} kg</Text>
+                  )}
+                </View>
+                <Text style={styles.menuArrow}>›</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
         <View style={styles.encouragement}>
-          <Text style={styles.encouragementEmoji}>🌟</Text>
-          <Text style={styles.encouragementText}>
+          <Text style={styles.encourageEmoji}>🌟</Text>
+          <Text style={styles.encourageText}>
             You're doing great. Every visit makes you more confident.
           </Text>
         </View>
@@ -64,140 +129,77 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  content: {
-    paddingBottom: Spacing.xxl,
-  },
+  container: { flex: 1, backgroundColor: Colors.background },
+  scroll: { paddingBottom: Spacing.xxl },
   header: {
-    paddingHorizontal: Spacing.md,
-    paddingTop: Spacing.lg,
-    paddingBottom: Spacing.md,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: Spacing.md, paddingTop: Spacing.lg, paddingBottom: Spacing.md,
   },
-  title: {
-    ...Typography.h2,
-    color: Colors.textPrimary,
+  title: { ...Typography.h2, color: Colors.textPrimary },
+  logoutBtn: {
+    paddingVertical: Spacing.xs, paddingHorizontal: Spacing.md,
+    borderRadius: BorderRadius.full, borderWidth: 1, borderColor: Colors.border,
   },
+  logoutText: { ...Typography.label, color: Colors.textSecondary },
   avatarSection: {
-    alignItems: 'center',
-    paddingVertical: Spacing.xl,
-    backgroundColor: Colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    flexDirection: 'row', alignItems: 'center',
+    paddingHorizontal: Spacing.md, paddingVertical: Spacing.lg,
+    backgroundColor: Colors.surface, borderBottomWidth: 1, borderBottomColor: Colors.border,
+    gap: Spacing.md,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: Colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: Spacing.md,
+    width: 64, height: 64, borderRadius: 32,
+    backgroundColor: Colors.primaryLight, alignItems: 'center', justifyContent: 'center',
   },
-  avatarText: {
-    fontSize: 36,
-  },
-  userName: {
-    ...Typography.h3,
-    color: Colors.textPrimary,
-  },
-  memberSince: {
-    ...Typography.bodySmall,
-    color: Colors.textSecondary,
-    marginTop: 4,
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    padding: Spacing.md,
-    gap: Spacing.sm,
-  },
+  avatarLetter: { fontSize: 28, fontWeight: '700', color: Colors.primary },
+  userName: { ...Typography.h3, color: Colors.textPrimary },
+  userEmail: { ...Typography.bodySmall, color: Colors.textSecondary, marginTop: 2 },
+  userGym: { ...Typography.bodySmall, color: Colors.accent, marginTop: 4, fontWeight: '500' },
+  statsRow: { flexDirection: 'row', padding: Spacing.md, gap: Spacing.sm },
   statCard: {
-    flex: 1,
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.border,
+    flex: 1, backgroundColor: Colors.surface, borderRadius: BorderRadius.md,
+    padding: Spacing.sm, alignItems: 'center', borderWidth: 1, borderColor: Colors.border,
   },
-  statIcon: {
-    fontSize: 22,
-    marginBottom: Spacing.xs,
+  statIcon: { fontSize: 20, marginBottom: 4 },
+  statValue: { ...Typography.h4, color: Colors.primary },
+  statLabel: { ...Typography.caption, color: Colors.textSecondary, textAlign: 'center', marginTop: 2 },
+  menuRow: {
+    flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.surface,
+    marginHorizontal: Spacing.md, marginBottom: Spacing.sm,
+    padding: Spacing.md, borderRadius: BorderRadius.md, borderWidth: 1, borderColor: Colors.border,
   },
-  statValue: {
-    ...Typography.h3,
-    color: Colors.primary,
-  },
-  statLabel: {
-    ...Typography.caption,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    marginTop: 2,
-  },
+  menuIcon: { fontSize: 22, marginRight: Spacing.md },
+  menuInfo: { flex: 1 },
+  menuLabel: { ...Typography.h4, color: Colors.textPrimary },
+  menuMeta: { ...Typography.bodySmall, color: Colors.textSecondary, marginTop: 2 },
+  menuArrow: { fontSize: 22, color: Colors.textDisabled },
   section: {
-    marginHorizontal: Spacing.md,
-    marginTop: Spacing.md,
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.md,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    overflow: 'hidden',
+    marginHorizontal: Spacing.md, marginBottom: Spacing.md,
+    backgroundColor: Colors.surface, borderRadius: BorderRadius.md,
+    borderWidth: 1, borderColor: Colors.border, overflow: 'hidden',
   },
   sectionTitle: {
-    ...Typography.label,
-    color: Colors.textSecondary,
-    padding: Spacing.md,
-    paddingBottom: Spacing.sm,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    ...Typography.label, color: Colors.textSecondary, textTransform: 'uppercase',
+    letterSpacing: 0.5, padding: Spacing.md, paddingBottom: Spacing.sm,
+    borderBottomWidth: 1, borderBottomColor: Colors.border,
   },
-  settingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+  progressRow: {
+    flexDirection: 'row', alignItems: 'center',
+    paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm,
+    borderBottomWidth: 1, borderBottomColor: Colors.border,
   },
-  settingIcon: {
-    fontSize: 18,
-    marginRight: Spacing.md,
-  },
-  settingLabel: {
-    ...Typography.body,
-    color: Colors.textPrimary,
-    flex: 1,
-  },
-  settingValue: {
-    ...Typography.bodySmall,
-    color: Colors.textSecondary,
-    marginRight: Spacing.sm,
-  },
-  settingArrow: {
-    fontSize: 18,
-    color: Colors.textDisabled,
-  },
+  progressInfo: { flex: 1 },
+  progressExercise: { ...Typography.label, color: Colors.textPrimary },
+  progressMachine: { ...Typography.caption, color: Colors.textSecondary, marginTop: 2 },
+  progressStats: { alignItems: 'flex-end', marginRight: Spacing.sm },
+  progressSessions: { ...Typography.caption, color: Colors.textSecondary },
+  progressBest: { ...Typography.caption, color: Colors.primary, fontWeight: '600', marginTop: 2 },
   encouragement: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    margin: Spacing.md,
-    marginTop: Spacing.xl,
-    backgroundColor: Colors.accentLight,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    gap: Spacing.sm,
+    flexDirection: 'row', alignItems: 'center',
+    margin: Spacing.md, marginTop: Spacing.sm,
+    backgroundColor: Colors.accentLight, borderRadius: BorderRadius.md,
+    padding: Spacing.md, gap: Spacing.sm,
   },
-  encouragementEmoji: {
-    fontSize: 24,
-  },
-  encouragementText: {
-    ...Typography.bodySmall,
-    color: Colors.accent,
-    flex: 1,
-    fontWeight: '500',
-  },
+  encourageEmoji: { fontSize: 24 },
+  encourageText: { ...Typography.bodySmall, color: Colors.accent, flex: 1, fontWeight: '500' },
 });
