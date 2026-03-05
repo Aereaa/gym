@@ -1,0 +1,185 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  SafeAreaView,
+} from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { ExploreStackParamList } from '../navigation/types';
+import { machines, exercises } from '../data';
+import { Colors, Typography, Spacing, BorderRadius } from '../theme';
+import ExerciseCard from '../components/ExerciseCard';
+import SetupStepList from '../components/SetupStepList';
+import EtiquetteList from '../components/EtiquetteList';
+
+type Props = NativeStackScreenProps<ExploreStackParamList, 'MachineDetail'>;
+
+type Tab = 'exercises' | 'setup' | 'etiquette';
+
+export default function MachineDetailScreen({ route, navigation }: Props) {
+  const { machineId } = route.params;
+  const machine = machines.find((m) => m.id === machineId);
+  const [activeTab, setActiveTab] = useState<Tab>('exercises');
+
+  if (!machine) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.errorText}>Machine not found</Text>
+      </SafeAreaView>
+    );
+  }
+
+  const machineExercises = exercises.filter((e) =>
+    machine.exerciseIds.includes(e.id),
+  );
+
+  const tabs: { key: Tab; label: string; icon: string }[] = [
+    { key: 'exercises', label: 'Exercises', icon: '🏋️' },
+    { key: 'setup', label: 'Setup', icon: '⚙️' },
+    { key: 'etiquette', label: 'Etiquette', icon: '✅' },
+  ];
+
+  return (
+    <SafeAreaView style={styles.container}>
+      {/* Machine hero */}
+      <View style={styles.hero}>
+        <View style={styles.heroIconBox}>
+          <Text style={styles.heroIcon}>
+            {machine.category === 'cardio' ? '🏃' : machine.category === 'cable' ? '🔗' : '💪'}
+          </Text>
+        </View>
+        <Text style={styles.machineName}>{machine.name}</Text>
+        <Text style={styles.machineDesc}>{machine.description}</Text>
+      </View>
+
+      {/* Tab bar */}
+      <View style={styles.tabBar}>
+        {tabs.map((tab) => (
+          <TouchableOpacity
+            key={tab.key}
+            style={[styles.tab, activeTab === tab.key && styles.tabActive]}
+            onPress={() => setActiveTab(tab.key)}
+          >
+            <Text style={styles.tabIcon}>{tab.icon}</Text>
+            <Text
+              style={[styles.tabLabel, activeTab === tab.key && styles.tabLabelActive]}
+            >
+              {tab.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* Tab content */}
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        {activeTab === 'exercises' && (
+          <View>
+            <Text style={styles.sectionHint}>
+              Tap an exercise to see step-by-step instructions.
+            </Text>
+            {machineExercises.map((ex) => (
+              <ExerciseCard
+                key={ex.id}
+                exercise={ex}
+                onPress={() => navigation.navigate('ExerciseDetail', { exerciseId: ex.id })}
+              />
+            ))}
+          </View>
+        )}
+
+        {activeTab === 'setup' && (
+          <SetupStepList steps={machine.setupSteps} />
+        )}
+
+        {activeTab === 'etiquette' && (
+          <EtiquetteList rules={machine.etiquetteRules} />
+        )}
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  hero: {
+    alignItems: 'center',
+    padding: Spacing.lg,
+    backgroundColor: Colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  heroIconBox: {
+    width: 72,
+    height: 72,
+    borderRadius: BorderRadius.lg,
+    backgroundColor: Colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: Spacing.md,
+  },
+  heroIcon: {
+    fontSize: 36,
+  },
+  machineName: {
+    ...Typography.h2,
+    color: Colors.textPrimary,
+    textAlign: 'center',
+    marginBottom: Spacing.sm,
+  },
+  machineDesc: {
+    ...Typography.bodySmall,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    maxWidth: 320,
+  },
+  tabBar: {
+    flexDirection: 'row',
+    backgroundColor: Colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  tab: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: Spacing.sm,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  tabActive: {
+    borderBottomColor: Colors.primary,
+  },
+  tabIcon: {
+    fontSize: 16,
+    marginBottom: 2,
+  },
+  tabLabel: {
+    ...Typography.caption,
+    color: Colors.textSecondary,
+    fontWeight: '500',
+  },
+  tabLabelActive: {
+    color: Colors.primary,
+    fontWeight: '700',
+  },
+  content: {
+    padding: Spacing.md,
+    paddingBottom: Spacing.xxl,
+  },
+  sectionHint: {
+    ...Typography.bodySmall,
+    color: Colors.textSecondary,
+    marginBottom: Spacing.md,
+  },
+  errorText: {
+    ...Typography.body,
+    color: Colors.error,
+    textAlign: 'center',
+    marginTop: Spacing.xxl,
+  },
+});
