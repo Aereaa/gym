@@ -8,6 +8,7 @@ export type RootStackParamList = {
 export type MainTabParamList = {
   Explore: NavigatorScreenParams<ExploreStackParamList>;
   Search: NavigatorScreenParams<SearchStackParamList>;
+  Mascot: undefined;
   Profile: NavigatorScreenParams<ProfileStackParamList>;
 };
 

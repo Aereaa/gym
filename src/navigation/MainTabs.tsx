@@ -4,15 +4,17 @@ import { Text } from 'react-native';
 import { MainTabParamList } from './types';
 import ExploreStack from './ExploreStack';
 import SearchStack from './SearchStack';
+import MascotScreen from '../screens/MascotScreen';
 import ProfileStack from './ProfileStack';
 import { Colors } from '../theme';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 const ICONS: Record<string, string> = {
-  Explore: '🏋️',
-  Search: '🔍',
-  Profile: '👤',
+  Explore: '\uD83C\uDFCB\uFE0F',
+  Search: '\uD83D\uDD0D',
+  Mascot: '\uD83D\uDC3E',
+  Profile: '\uD83D\uDC64',
 };
 
 function TabIcon({ label, focused }: { label: string; focused: boolean }) {
@@ -42,6 +44,7 @@ export default function MainTabs() {
     >
       <Tab.Screen name="Explore" component={ExploreStack} options={{ title: 'My Gym' }} />
       <Tab.Screen name="Search" component={SearchStack} options={{ title: 'Discover' }} />
+      <Tab.Screen name="Mascot" component={MascotScreen} options={{ title: 'Mazlicek' }} />
       <Tab.Screen name="Profile" component={ProfileStack} options={{ title: 'Profile' }} />
     </Tab.Navigator>
   );

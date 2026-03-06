@@ -8,6 +8,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from '../navigation/types';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserData } from '../contexts/UserDataContext';
+import { useMascot, getMascotEmoji, getPhaseLabel } from '../contexts/MascotContext';
 import { gyms } from '../data';
 import { Colors, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
 
@@ -16,6 +17,7 @@ type Props = NativeStackScreenProps<ProfileStackParamList, 'ProfileHome'>;
 export default function ProfileScreen({ navigation }: Props) {
   const { user, logout, isGuest } = useAuth();
   const { savedMachineIds, goals, addGoal, toggleGoal, workoutLogs } = useUserData();
+  const { mascot, level, phase, mood } = useMascot();
   const [goalText, setGoalText] = useState('');
 
   const gym = user?.gymId ? gyms.find((g) => g.id === user.gymId) : null;
@@ -105,6 +107,19 @@ export default function ProfileScreen({ navigation }: Props) {
               </View>
             </View>
           )}
+
+          {/* ── Mascot mini ───────────────────────────── */}
+          <TouchableOpacity
+            style={styles.mascotMini}
+            onPress={() => navigation.getParent()?.navigate('Mascot')}
+          >
+            <Text style={{ fontSize: 32 }}>{getMascotEmoji(phase, mood)}</Text>
+            <View style={{ flex: 1, marginLeft: Spacing.sm }}>
+              <Text style={styles.mascotMiniName}>{mascot.name}</Text>
+              <Text style={styles.mascotMiniInfo}>{getPhaseLabel(phase)} &middot; Level {level} &middot; {mascot.xp} XP</Text>
+            </View>
+            <Text style={styles.menuArrow}>&rsaquo;</Text>
+          </TouchableOpacity>
 
           {/* ── Stats ─────────────────────────────────── */}
           <View style={styles.statsRow}>
@@ -291,6 +306,16 @@ const styles = StyleSheet.create({
   btnOutlineText: { ...Typography.button, color: Colors.primary },
   btnOutlineSm: { borderRadius: BorderRadius.md, paddingVertical: Spacing.xs, paddingHorizontal: Spacing.md, borderWidth: 1, borderColor: Colors.primary, marginTop: Spacing.sm },
   btnOutlineSmText: { ...Typography.label, color: Colors.primary },
+
+  // Mascot mini
+  mascotMini: {
+    backgroundColor: Colors.surface, borderRadius: BorderRadius.lg,
+    padding: Spacing.md, marginBottom: Spacing.md,
+    borderWidth: 1, borderColor: Colors.primary,
+    flexDirection: 'row', alignItems: 'center',
+  },
+  mascotMiniName: { ...Typography.h4, color: Colors.textPrimary },
+  mascotMiniInfo: { ...Typography.caption, color: Colors.textSecondary, marginTop: 2 },
 
   // Stats
   statsRow: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.md },
