@@ -373,6 +373,27 @@ export default function ProfileScreen({ navigation }: Props) {
             )}
           </View>
 
+          {/* Quick Access */}
+          <View style={styles.card}>
+            <Text style={[styles.cardTitle, { marginBottom: Spacing.sm }]}>Quick Access</Text>
+
+            <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('TrainingPlans')}>
+              <View style={[styles.menuIconBox, { backgroundColor: ACCENTS.amberLight }]}>
+                <Text style={styles.menuIconText}>{'\uD83D\uDCCB'}</Text>
+              </View>
+              <Text style={styles.menuText}>Training Plans</Text>
+              <Text style={styles.menuArrow}>{'\u203A'}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('FirstVisitGuide')}>
+              <View style={[styles.menuIconBox, { backgroundColor: ACCENTS.greenLight }]}>
+                <Text style={styles.menuIconText}>{'\uD83C\uDFE0'}</Text>
+              </View>
+              <Text style={styles.menuText}>First Visit Guide</Text>
+              <Text style={styles.menuArrow}>{'\u203A'}</Text>
+            </TouchableOpacity>
+          </View>
+
           {/* My Machines */}
           <View style={styles.card}>
             <View style={styles.cardHeader}>

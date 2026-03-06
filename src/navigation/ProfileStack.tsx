@@ -10,6 +10,9 @@ import MachineDetailScreen from '../screens/MachineDetailScreen';
 import ExerciseDetailScreen from '../screens/ExerciseDetailScreen';
 import LogWorkoutScreen from '../screens/LogWorkoutScreen';
 import ProgressScreen from '../screens/ProgressScreen';
+import TrainingPlansScreen from '../screens/TrainingPlansScreen';
+import TrainingPlanDetailScreen from '../screens/TrainingPlanDetailScreen';
+import FirstVisitGuideScreen from '../screens/FirstVisitGuideScreen';
 import { useTheme } from '../theme';
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
@@ -32,6 +35,9 @@ export default function ProfileStack() {
       <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Sign up' }} />
       <Stack.Screen name="Goals" component={GoalsScreen} options={{ title: 'My Goals' }} />
       <Stack.Screen name="MyMachines" component={MyMachinesScreen} options={{ title: 'My Machines' }} />
+      <Stack.Screen name="TrainingPlans" component={TrainingPlansScreen} options={{ title: 'Training Plans' }} />
+      <Stack.Screen name="TrainingPlanDetail" component={TrainingPlanDetailScreen} options={{ title: 'Plan' }} />
+      <Stack.Screen name="FirstVisitGuide" component={FirstVisitGuideScreen} options={{ title: 'First Visit Guide' }} />
       <Stack.Screen name="MachineDetail" component={MachineDetailScreen} options={{ title: 'Machine' }} />
       <Stack.Screen name="ExerciseDetail" component={ExerciseDetailScreen} options={{ title: 'Exercise' }} />
       <Stack.Screen name="LogWorkout" component={LogWorkoutScreen} options={{ title: 'Log Workout', presentation: 'modal' }} />

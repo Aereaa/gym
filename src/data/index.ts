@@ -1,4 +1,5 @@
 export { gyms } from './gyms';
 export { machines } from './machines';
 export { exercises } from './exercises';
-export type { Gym, Machine, Exercise, MuscleGroup, Difficulty, KeyPoint, CommonMistake, UserProfile, Goal, WorkoutLog, WorkoutSet } from './types';
+export { trainingPlans } from './trainingPlans';
+export type { Gym, Machine, Exercise, MuscleGroup, Difficulty, KeyPoint, CommonMistake, UserProfile, Goal, WorkoutLog, WorkoutSet, TrainingPlan, TrainingPlanExercise } from './types';

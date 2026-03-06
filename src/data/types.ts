@@ -101,6 +101,26 @@ export interface Goal {
   completedAt?: string;
 }
 
+// ── Training plans ────────────────────────────────────────────────────────────
+
+export interface TrainingPlanExercise {
+  exerciseId: string;
+  sets: number;
+  reps: string;
+  restSeconds: number;
+}
+
+export interface TrainingPlan {
+  id: string;
+  name: string;
+  description: string;
+  durationMinutes: number;
+  difficulty: Difficulty;
+  targetMuscles: MuscleGroup[];
+  exercises: TrainingPlanExercise[];
+  icon: string;
+}
+
 // ── Workout logging ───────────────────────────────────────────────────────────
 
 export interface WorkoutSet {

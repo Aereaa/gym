@@ -32,6 +32,9 @@ export type ProfileStackParamList = {
   Register: undefined;
   Goals: undefined;
   MyMachines: undefined;
+  TrainingPlans: undefined;
+  TrainingPlanDetail: { planId: string };
+  FirstVisitGuide: undefined;
   MachineDetail: { machineId: string; gymId?: string };
   ExerciseDetail: { exerciseId: string };
   LogWorkout: { exerciseId: string; exerciseName: string; machineName: string };
