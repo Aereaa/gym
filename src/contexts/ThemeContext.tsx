@@ -25,9 +25,52 @@ export interface ThemeColors {
   border: string;
   borderFocus: string;
   glow: string;
+  isDark: boolean;
 }
 
+// ── Fixed accent palette — decorative colors used across all themes ──────────
+
+export const ACCENTS = {
+  coral: '#E8636E',
+  coralLight: '#FFF0F1',
+  coralDark: '#D14D58',
+  teal: '#2EC4B6',
+  tealLight: '#E0F7F5',
+  tealDark: '#1BA89B',
+  purple: '#845EC2',
+  purpleLight: '#F0EBFA',
+  amber: '#FFB347',
+  amberLight: '#FFF5E6',
+  green: '#10B981',
+  greenLight: '#D1FAE5',
+} as const;
+
 // ── Theme presets ────────────────────────────────────────────────────────────
+
+const CORAL: ThemeColors = {
+  primary: '#E8636E',
+  primaryLight: '#FFF0F1',
+  primaryDark: '#D14D58',
+  accent: '#2EC4B6',
+  accentLight: '#E0F7F5',
+  background: '#FAFAF8',
+  surface: '#FFFFFF',
+  surfaceAlt: '#F5F5F3',
+  textPrimary: '#2D2D3F',
+  textSecondary: '#6B7280',
+  textDisabled: '#9CA3AF',
+  textOnPrimary: '#FFFFFF',
+  error: '#EF4444',
+  warning: '#F59E0B',
+  success: '#10B981',
+  muscleActive: '#E8636E',
+  muscleSecondary: '#2EC4B6',
+  muscleInactive: '#F0F0ED',
+  border: '#F0F0ED',
+  borderFocus: '#E8636E',
+  glow: 'rgba(232,99,110,0.3)',
+  isDark: false,
+};
 
 const BLUE: ThemeColors = {
   primary: '#2563EB',
@@ -51,6 +94,7 @@ const BLUE: ThemeColors = {
   border: 'rgba(255,255,255,0.07)',
   borderFocus: '#2563EB',
   glow: 'rgba(37,99,235,0.4)',
+  isDark: true,
 };
 
 const PINK: ThemeColors = {
@@ -75,6 +119,7 @@ const PINK: ThemeColors = {
   border: 'rgba(255,255,255,0.07)',
   borderFocus: '#EC4899',
   glow: 'rgba(236,72,153,0.4)',
+  isDark: true,
 };
 
 const GREEN: ThemeColors = {
@@ -99,6 +144,7 @@ const GREEN: ThemeColors = {
   border: 'rgba(255,255,255,0.07)',
   borderFocus: '#10B981',
   glow: 'rgba(16,185,129,0.4)',
+  isDark: true,
 };
 
 const RED_BLACK: ThemeColors = {
@@ -123,12 +169,14 @@ const RED_BLACK: ThemeColors = {
   border: 'rgba(255,255,255,0.07)',
   borderFocus: '#EF4444',
   glow: 'rgba(239,68,68,0.4)',
+  isDark: true,
 };
 
-export const THEMES = { blue: BLUE, pink: PINK, green: GREEN, redblack: RED_BLACK } as const;
+export const THEMES = { coral: CORAL, blue: BLUE, pink: PINK, green: GREEN, redblack: RED_BLACK } as const;
 export type ThemeName = keyof typeof THEMES;
 
 export const THEME_META: { key: ThemeName; label: string; swatch: string }[] = [
+  { key: 'coral', label: 'Coral', swatch: '#E8636E' },
   { key: 'blue', label: 'Ocean Blue', swatch: '#2563EB' },
   { key: 'pink', label: 'Pink Vibes', swatch: '#EC4899' },
   { key: 'green', label: 'Fresh Green', swatch: '#10B981' },
@@ -144,15 +192,15 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  colors: BLUE,
-  themeName: 'blue',
+  colors: CORAL,
+  themeName: 'coral',
   setTheme: () => {},
 });
 
 const STORAGE_KEY = '@gymfidence_theme';
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [themeName, setThemeName] = useState<ThemeName>('blue');
+  const [themeName, setThemeName] = useState<ThemeName>('coral');
 
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY).then((v) => {

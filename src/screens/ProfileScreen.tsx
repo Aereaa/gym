@@ -10,7 +10,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useUserData } from '../contexts/UserDataContext';
 import { useMascot, getMascotEmoji, getPhaseLabel } from '../contexts/MascotContext';
 import { gyms } from '../data';
-import { useTheme, THEME_META, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
+import { useTheme, THEME_META, ACCENTS, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'ProfileHome'>;
 
@@ -60,6 +60,14 @@ export default function ProfileScreen({ navigation }: Props) {
     setGoalText('');
   }
 
+  const cardShadow = {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 3,
+    elevation: 2,
+  };
+
   const styles = React.useMemo(() => StyleSheet.create({
     safe: { flex: 1, backgroundColor: C.background },
     page: { ...PageContainer, padding: Spacing.md, paddingTop: Spacing.lg },
@@ -76,8 +84,7 @@ export default function ProfileScreen({ navigation }: Props) {
       borderRadius: BorderRadius.lg,
       padding: Spacing.md,
       marginBottom: Spacing.md,
-      borderWidth: 1,
-      borderColor: C.border,
+      ...cardShadow,
     },
     cardHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: Spacing.md },
     cardTitle: { ...Typography.h4, color: C.textPrimary },
@@ -93,9 +100,9 @@ export default function ProfileScreen({ navigation }: Props) {
     userRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
     avatarLg: {
       width: 56, height: 56, borderRadius: 28,
-      backgroundColor: C.primaryLight, alignItems: 'center', justifyContent: 'center',
+      backgroundColor: ACCENTS.coralLight, alignItems: 'center', justifyContent: 'center',
     },
-    avatarLetter: { fontSize: 24, fontWeight: '700', color: C.primary },
+    avatarLetter: { fontSize: 24, fontWeight: '700', color: ACCENTS.coral },
     userName: { ...Typography.h3, color: C.textPrimary },
     userMeta: { ...Typography.bodySmall, color: C.textSecondary, marginTop: 2 },
     userGym: { ...Typography.bodySmall, color: C.accent, fontWeight: '500', marginTop: 2 },
@@ -134,6 +141,7 @@ export default function ProfileScreen({ navigation }: Props) {
       padding: Spacing.md, marginBottom: Spacing.md,
       borderWidth: 1, borderColor: C.primary,
       flexDirection: 'row', alignItems: 'center',
+      ...cardShadow,
     },
     mascotMiniName: { ...Typography.h4, color: C.textPrimary },
     mascotMiniInfo: { ...Typography.caption, color: C.textSecondary, marginTop: 2 },
@@ -151,17 +159,17 @@ export default function ProfileScreen({ navigation }: Props) {
       justifyContent: 'center',
       backgroundColor: C.surfaceAlt,
     },
-    themeSwatch: { width: 28, height: 28, borderRadius: 14, marginBottom: Spacing.xs },
+    themeSwatch: { width: 32, height: 32, borderRadius: 16, marginBottom: Spacing.xs },
     themeLabel: { ...Typography.caption, color: C.textSecondary, fontWeight: '500' },
     themeCheck: { ...Typography.caption, color: C.primary, fontWeight: '700', marginTop: 2 },
 
     // Stats
     statsRow: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.md },
     statCard: {
-      flex: 1, backgroundColor: C.surface, borderRadius: BorderRadius.lg,
-      paddingVertical: Spacing.md, alignItems: 'center', borderWidth: 1, borderColor: C.border,
+      flex: 1, borderRadius: 14,
+      paddingVertical: Spacing.md, alignItems: 'center',
+      ...cardShadow,
     },
-    statValue: { ...Typography.h2, color: C.primary },
     statLabel: { ...Typography.caption, color: C.textSecondary, marginTop: 2, textTransform: 'uppercase', letterSpacing: 0.5 },
 
     // Goals
@@ -182,7 +190,7 @@ export default function ProfileScreen({ navigation }: Props) {
     },
     checkbox: { marginRight: Spacing.sm },
     checkboxInner: {
-      width: 22, height: 22, borderRadius: 11,
+      width: 22, height: 22, borderRadius: 4,
       borderWidth: 2, borderColor: C.border,
     },
     goalText: { ...Typography.body, color: C.textPrimary, flex: 1 },
@@ -195,7 +203,12 @@ export default function ProfileScreen({ navigation }: Props) {
       flexDirection: 'row', alignItems: 'center', paddingVertical: Spacing.sm,
       borderTopWidth: 1, borderTopColor: C.border,
     },
-    menuIcon: { fontSize: 18, marginRight: Spacing.sm },
+    menuIconBox: {
+      width: 32, height: 32, borderRadius: 8,
+      alignItems: 'center', justifyContent: 'center',
+      marginRight: Spacing.sm,
+    },
+    menuIconText: { fontSize: 16 },
     menuText: { ...Typography.body, color: C.textPrimary, flex: 1 },
     menuArrow: { fontSize: 20, color: C.textDisabled, marginLeft: Spacing.sm },
 
@@ -296,16 +309,16 @@ export default function ProfileScreen({ navigation }: Props) {
 
           {/* Stats */}
           <View style={styles.statsRow}>
-            <View style={styles.statCard}>
-              <Text style={styles.statValue}>{savedMachineIds.length}</Text>
+            <View style={[styles.statCard, { backgroundColor: ACCENTS.coralLight }]}>
+              <Text style={[Typography.h2, { color: ACCENTS.coral }]}>{savedMachineIds.length}</Text>
               <Text style={styles.statLabel}>Machines</Text>
             </View>
-            <View style={styles.statCard}>
-              <Text style={styles.statValue}>{completedGoals}/{goals.length}</Text>
+            <View style={[styles.statCard, { backgroundColor: ACCENTS.tealLight }]}>
+              <Text style={[Typography.h2, { color: ACCENTS.teal }]}>{completedGoals}/{goals.length}</Text>
               <Text style={styles.statLabel}>Goals</Text>
             </View>
-            <View style={styles.statCard}>
-              <Text style={styles.statValue}>{workoutLogs.length}</Text>
+            <View style={[styles.statCard, { backgroundColor: ACCENTS.purpleLight }]}>
+              <Text style={[Typography.h2, { color: ACCENTS.purple }]}>{workoutLogs.length}</Text>
               <Text style={styles.statLabel}>Sessions</Text>
             </View>
           </View>
@@ -381,7 +394,9 @@ export default function ProfileScreen({ navigation }: Props) {
               </View>
             ) : (
               <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('MyMachines')}>
-                <Text style={styles.menuIcon}>{'\uD83D\uDCCC'}</Text>
+                <View style={[styles.menuIconBox, { backgroundColor: ACCENTS.coralLight }]}>
+                  <Text style={styles.menuIconText}>{'\uD83D\uDCCC'}</Text>
+                </View>
                 <Text style={styles.menuText}>{savedMachineIds.length} saved machine{savedMachineIds.length !== 1 ? 's' : ''}</Text>
                 <Text style={styles.menuArrow}>{'\u203A'}</Text>
               </TouchableOpacity>
@@ -391,7 +406,9 @@ export default function ProfileScreen({ navigation }: Props) {
               style={styles.menuItem}
               onPress={() => navigation.getParent()?.navigate('Search')}
             >
-              <Text style={styles.menuIcon}>{'\uD83D\uDD0D'}</Text>
+              <View style={[styles.menuIconBox, { backgroundColor: ACCENTS.tealLight }]}>
+                <Text style={styles.menuIconText}>{'\uD83D\uDD0D'}</Text>
+              </View>
               <Text style={styles.menuText}>Browse & add machines</Text>
               <Text style={styles.menuArrow}>{'\u203A'}</Text>
             </TouchableOpacity>

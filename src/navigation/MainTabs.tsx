@@ -1,6 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text } from 'react-native';
+import { Text, Platform } from 'react-native';
 import { MainTabParamList } from './types';
 import ExploreStack from './ExploreStack';
 import SearchStack from './SearchStack';
@@ -20,7 +20,7 @@ const ICONS: Record<string, string> = {
 function TabIcon({ label, focused }: { label: string; focused: boolean }) {
   return (
     <Text style={{ fontSize: focused ? 22 : 20, opacity: focused ? 1 : 0.6 }}>
-      {ICONS[label] ?? '●'}
+      {ICONS[label] ?? '\u25CF'}
     </Text>
   );
 }
@@ -34,14 +34,22 @@ export default function MainTabs() {
         headerShown: false,
         tabBarIcon: ({ focused }) => <TabIcon label={route.name} focused={focused} />,
         tabBarActiveTintColor: C.primary,
-        tabBarInactiveTintColor: C.textSecondary,
+        tabBarInactiveTintColor: C.textDisabled,
         tabBarStyle: {
-          backgroundColor: C.surface,
+          backgroundColor: C.isDark ? C.surface : 'rgba(255,255,255,0.95)',
           borderTopColor: C.border,
           paddingBottom: 4,
           height: 60,
+          ...(C.isDark ? {} : {
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.04,
+            shadowRadius: 8,
+            elevation: 8,
+          }),
+          ...Platform.select({ web: { backdropFilter: 'blur(10px)' } as any }),
         },
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '500' },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' as const },
       })}
     >
       <Tab.Screen name="Explore" component={ExploreStack} options={{ title: 'My Gym' }} />

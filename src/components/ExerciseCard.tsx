@@ -1,13 +1,20 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Exercise } from '../data/types';
-import { useTheme, Typography, Spacing, BorderRadius } from '../theme';
+import { useTheme, ACCENTS, Typography, Spacing, BorderRadius } from '../theme';
 import DifficultyBadge from './DifficultyBadge';
 
 interface Props {
   exercise: Exercise;
   onPress: () => void;
 }
+
+const MUSCLE_COLORS = [
+  { bg: ACCENTS.coralLight, text: ACCENTS.coral },
+  { bg: ACCENTS.tealLight, text: ACCENTS.tealDark },
+  { bg: ACCENTS.purpleLight, text: ACCENTS.purple },
+  { bg: ACCENTS.amberLight, text: '#92400E' },
+];
 
 export default function ExerciseCard({ exercise, onPress }: Props) {
   const { colors: C } = useTheme();
@@ -22,6 +29,11 @@ export default function ExerciseCard({ exercise, onPress }: Props) {
           marginBottom: Spacing.sm,
           borderWidth: 1,
           borderColor: C.border,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.04,
+          shadowRadius: 3,
+          elevation: 2,
         },
         top: {
           flexDirection: 'row',
@@ -49,14 +61,12 @@ export default function ExerciseCard({ exercise, onPress }: Props) {
           marginBottom: Spacing.sm,
         },
         muscleTag: {
-          backgroundColor: C.primaryLight,
           paddingVertical: 2,
           paddingHorizontal: Spacing.sm,
           borderRadius: BorderRadius.full,
         },
         muscleText: {
           ...Typography.caption,
-          color: C.primary,
           fontWeight: '600',
           textTransform: 'capitalize',
         },
@@ -84,11 +94,16 @@ export default function ExerciseCard({ exercise, onPress }: Props) {
       </View>
 
       <View style={styles.muscles}>
-        {exercise.primaryMuscles.map((m) => (
-          <View key={m} style={styles.muscleTag}>
-            <Text style={styles.muscleText}>{m}</Text>
-          </View>
-        ))}
+        {exercise.primaryMuscles.map((m, i) => {
+          const mc = C.isDark
+            ? { bg: C.primaryLight, text: C.primary }
+            : MUSCLE_COLORS[i % MUSCLE_COLORS.length];
+          return (
+            <View key={m} style={[styles.muscleTag, { backgroundColor: mc.bg }]}>
+              <Text style={[styles.muscleText, { color: mc.text }]}>{m}</Text>
+            </View>
+          );
+        })}
       </View>
 
       <View style={styles.meta}>

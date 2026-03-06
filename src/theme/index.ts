@@ -2,7 +2,7 @@ import { ViewStyle } from 'react-native';
 
 export { Colors } from './colors';
 export { Typography } from './typography';
-export { useTheme, ThemeProvider, THEME_META } from '../contexts/ThemeContext';
+export { useTheme, ThemeProvider, THEME_META, ACCENTS } from '../contexts/ThemeContext';
 export type { ThemeColors, ThemeName } from '../contexts/ThemeContext';
 
 export const Spacing = {

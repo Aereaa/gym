@@ -22,6 +22,11 @@ export default function StepCard({ stepNumber, instruction }: Props) {
           marginBottom: Spacing.sm,
           borderWidth: 1,
           borderColor: C.border,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.04,
+          shadowRadius: 3,
+          elevation: 2,
         },
         numberBox: {
           width: 32,

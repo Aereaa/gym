@@ -10,7 +10,7 @@ import {
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ExploreStackParamList } from '../navigation/types';
 import { machines, exercises } from '../data';
-import { useTheme, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
+import { useTheme, ACCENTS, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
 import ExerciseCard from '../components/ExerciseCard';
 import SetupStepList from '../components/SetupStepList';
 import EtiquetteList from '../components/EtiquetteList';
@@ -42,7 +42,7 @@ export default function MachineDetailScreen({ route, navigation }: Props) {
       width: 72,
       height: 72,
       borderRadius: BorderRadius.lg,
-      backgroundColor: C.primaryLight,
+      backgroundColor: C.isDark ? C.primaryLight : ACCENTS.coralLight,
       alignItems: 'center',
       justifyContent: 'center',
       marginBottom: Spacing.md,

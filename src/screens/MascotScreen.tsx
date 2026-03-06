@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity,
   TextInput,
 } from 'react-native';
-import { useTheme, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
+import { useTheme, Typography, Spacing, BorderRadius, PageContainer, ACCENTS } from '../theme';
 import {
   useMascot, getPhaseLabel, getMascotEmoji, getMoodMessage, getPhase,
 } from '../contexts/MascotContext';
@@ -22,6 +22,22 @@ const PHASE_COLORS = {
   sportovec: '#2563EB',
   sampion: '#F59E0B',
   legenda: '#A855F7',
+} as const;
+
+const ACCESSORIES = [
+  { emoji: '\uD83D\uDC55', label: 'Tricko', unlocked: true, bg: ACCENTS.coralLight, border: ACCENTS.coral },
+  { emoji: '\uD83E\uDDE2', label: 'Cepice', unlocked: true, bg: ACCENTS.amberLight, border: ACCENTS.amber },
+  { emoji: '\uD83C\uDFCB\uFE0F', label: 'Cinka', unlocked: true, bg: ACCENTS.tealLight, border: ACCENTS.teal },
+  { emoji: '\uD83D\uDD12', label: 'Zamceno', unlocked: false, bg: '#F3F4F6', border: '#D1D5DB' },
+  { emoji: '\uD83D\uDD12', label: 'Zamceno', unlocked: false, bg: '#F3F4F6', border: '#D1D5DB' },
+];
+
+const CARD_SHADOW = {
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 1 },
+  shadowOpacity: 0.04,
+  shadowRadius: 3,
+  elevation: 2,
 } as const;
 
 export default function MascotScreen() {
@@ -48,6 +64,11 @@ export default function MascotScreen() {
   const phaseColor = PHASE_COLORS[phase];
   const moodColor = MOOD_COLORS[mood];
 
+  // Simulated pet stats (derived from mascot data)
+  const happiness = Math.min(100, Math.round(xpProgress.progress * 100 + (mood === 'happy' ? 30 : mood === 'neutral' ? 15 : 0)));
+  const energy = Math.min(100, Math.round(50 + workoutLogs.length * 5));
+  const strength = Math.min(100, Math.round(level * 4));
+
   const styles = React.useMemo(() => StyleSheet.create({
     safe: { flex: 1, backgroundColor: C.background },
     page: { ...PageContainer, padding: Spacing.md, paddingTop: Spacing.lg },
@@ -56,12 +77,13 @@ export default function MascotScreen() {
 
     // Mascot card
     mascotCard: {
-      backgroundColor: C.surface,
+      backgroundColor: '#FFF8E7',
       borderRadius: BorderRadius.lg,
       padding: Spacing.lg,
       marginBottom: Spacing.md,
       borderWidth: 2,
       alignItems: 'center',
+      ...CARD_SHADOW,
     },
     mascotCircle: {
       width: 120, height: 120, borderRadius: 60,
@@ -97,6 +119,29 @@ export default function MascotScreen() {
     moodDot: { width: 8, height: 8, borderRadius: 4 },
     moodText: { ...Typography.bodySmall, fontWeight: '500' },
 
+    // Pet stats row
+    petStatsRow: {
+      flexDirection: 'row',
+      gap: Spacing.sm,
+      marginBottom: Spacing.md,
+    },
+    petStatCard: {
+      flex: 1,
+      backgroundColor: '#fff',
+      borderRadius: 12,
+      padding: Spacing.sm,
+      alignItems: 'center',
+      ...CARD_SHADOW,
+    },
+    petStatIcon: { fontSize: 20, marginBottom: 4 },
+    petStatLabel: { ...Typography.caption, color: C.textSecondary, marginBottom: 4, fontWeight: '600' },
+    petStatBarOuter: {
+      width: '100%', height: 6, backgroundColor: C.surfaceAlt,
+      borderRadius: 3, overflow: 'hidden',
+    },
+    petStatBarInner: { height: '100%', borderRadius: 3 },
+    petStatValue: { ...Typography.caption, color: C.textSecondary, marginTop: 2, fontSize: 10 },
+
     // Cards
     card: {
       backgroundColor: C.surface,
@@ -105,6 +150,7 @@ export default function MascotScreen() {
       marginBottom: Spacing.md,
       borderWidth: 1,
       borderColor: C.border,
+      ...CARD_SHADOW,
     },
     cardTitle: { ...Typography.h4, color: C.textPrimary, marginBottom: Spacing.md },
 
@@ -122,12 +168,13 @@ export default function MascotScreen() {
     // Stats
     statsRow: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.md },
     statCard: {
-      flex: 1, backgroundColor: C.surface, borderRadius: BorderRadius.lg,
-      paddingVertical: Spacing.md, alignItems: 'center', borderWidth: 1, borderColor: C.border,
+      flex: 1, borderRadius: BorderRadius.lg,
+      paddingVertical: Spacing.md, alignItems: 'center',
+      ...CARD_SHADOW,
     },
     statEmoji: { fontSize: 20, marginBottom: 4 },
-    statValue: { ...Typography.h2, color: C.primary },
-    statLabel: { ...Typography.caption, color: C.textSecondary, marginTop: 2, textTransform: 'uppercase', letterSpacing: 0.5 },
+    statValue: { ...Typography.h2 },
+    statLabel: { ...Typography.caption, marginTop: 2, textTransform: 'uppercase', letterSpacing: 0.5 },
 
     // XP sources
     xpSource: {
@@ -160,6 +207,23 @@ export default function MascotScreen() {
     },
     moodInfoDot: { fontSize: 18 },
     moodInfoText: { ...Typography.bodySmall, color: C.textPrimary, flex: 1 },
+
+    // Accessories
+    accessoriesGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: Spacing.sm,
+    },
+    accessoryItem: {
+      width: '30%',
+      aspectRatio: 1,
+      borderRadius: 12,
+      borderWidth: 1.5,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    accessoryEmoji: { fontSize: 28, marginBottom: 4 },
+    accessoryLabel: { ...Typography.caption, fontSize: 10, fontWeight: '600' },
   }), [C]);
 
   return (
@@ -213,6 +277,34 @@ export default function MascotScreen() {
             </View>
           </View>
 
+          {/* Pet Stats Row */}
+          <View style={styles.petStatsRow}>
+            <View style={styles.petStatCard}>
+              <Text style={styles.petStatIcon}>{'\u2764\uFE0F'}</Text>
+              <Text style={styles.petStatLabel}>Stesti</Text>
+              <View style={styles.petStatBarOuter}>
+                <View style={[styles.petStatBarInner, { width: `${happiness}%`, backgroundColor: ACCENTS.coral }]} />
+              </View>
+              <Text style={styles.petStatValue}>{happiness}%</Text>
+            </View>
+            <View style={styles.petStatCard}>
+              <Text style={styles.petStatIcon}>{'\u26A1'}</Text>
+              <Text style={styles.petStatLabel}>Energie</Text>
+              <View style={styles.petStatBarOuter}>
+                <View style={[styles.petStatBarInner, { width: `${energy}%`, backgroundColor: ACCENTS.amber }]} />
+              </View>
+              <Text style={styles.petStatValue}>{energy}%</Text>
+            </View>
+            <View style={styles.petStatCard}>
+              <Text style={styles.petStatIcon}>{'\uD83D\uDCAA'}</Text>
+              <Text style={styles.petStatLabel}>Sila</Text>
+              <View style={styles.petStatBarOuter}>
+                <View style={[styles.petStatBarInner, { width: `${strength}%`, backgroundColor: ACCENTS.teal }]} />
+              </View>
+              <Text style={styles.petStatValue}>{strength}%</Text>
+            </View>
+          </View>
+
           {/* XP Progress */}
           <View style={styles.card}>
             <Text style={styles.cardTitle}>XP Pokrok</Text>
@@ -232,20 +324,20 @@ export default function MascotScreen() {
 
           {/* Stats */}
           <View style={styles.statsRow}>
-            <View style={styles.statCard}>
+            <View style={[styles.statCard, { backgroundColor: ACCENTS.coralLight }]}>
               <Text style={styles.statEmoji}>{'\u2B50'}</Text>
-              <Text style={styles.statValue}>{mascot.xp}</Text>
-              <Text style={styles.statLabel}>XP</Text>
+              <Text style={[styles.statValue, { color: ACCENTS.coral }]}>{mascot.xp}</Text>
+              <Text style={[styles.statLabel, { color: ACCENTS.coral }]}>XP</Text>
             </View>
-            <View style={styles.statCard}>
+            <View style={[styles.statCard, { backgroundColor: ACCENTS.amberLight }]}>
               <Text style={styles.statEmoji}>{'\uD83E\uDE99'}</Text>
-              <Text style={styles.statValue}>{mascot.coins}</Text>
-              <Text style={styles.statLabel}>GymCoiny</Text>
+              <Text style={[styles.statValue, { color: ACCENTS.amber }]}>{mascot.coins}</Text>
+              <Text style={[styles.statLabel, { color: ACCENTS.amber }]}>GymCoiny</Text>
             </View>
-            <View style={styles.statCard}>
+            <View style={[styles.statCard, { backgroundColor: ACCENTS.purpleLight }]}>
               <Text style={styles.statEmoji}>{'\uD83C\uDFC5'}</Text>
-              <Text style={styles.statValue}>{level}</Text>
-              <Text style={styles.statLabel}>Level</Text>
+              <Text style={[styles.statValue, { color: ACCENTS.purple }]}>{level}</Text>
+              <Text style={[styles.statLabel, { color: ACCENTS.purple }]}>Level</Text>
             </View>
           </View>
 
@@ -328,6 +420,31 @@ export default function MascotScreen() {
             <Text style={[styles.moodInfo, { marginTop: Spacing.sm, fontStyle: 'italic' }]}>
               Mazlicek nikdy neztraci XP ani level. Jen vizualne smutni.
             </Text>
+          </View>
+
+          {/* Accessories */}
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Prislusenstvi</Text>
+            <View style={styles.accessoriesGrid}>
+              {ACCESSORIES.map((item, idx) => (
+                <View
+                  key={idx}
+                  style={[
+                    styles.accessoryItem,
+                    {
+                      backgroundColor: item.bg,
+                      borderColor: item.border,
+                      opacity: item.unlocked ? 1 : 0.5,
+                    },
+                  ]}
+                >
+                  <Text style={styles.accessoryEmoji}>{item.emoji}</Text>
+                  <Text style={[styles.accessoryLabel, { color: item.unlocked ? item.border : '#9CA3AF' }]}>
+                    {item.label}
+                  </Text>
+                </View>
+              ))}
+            </View>
           </View>
 
           <View style={{ height: Spacing.xxl }} />

@@ -8,7 +8,7 @@ import { SearchStackParamList } from '../navigation/types';
 import { machines } from '../data';
 import { Machine } from '../data/types';
 import { useUserData } from '../contexts/UserDataContext';
-import { useTheme, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
+import { useTheme, ACCENTS, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
 
 type Props = NativeStackScreenProps<SearchStackParamList, 'MachineSearch'>;
 
@@ -77,6 +77,8 @@ export default function MachineSearchScreen({ navigation }: Props) {
       flexDirection: 'row', alignItems: 'center',
       backgroundColor: C.surface, borderRadius: BorderRadius.lg,
       padding: Spacing.md, borderWidth: 1, borderColor: C.border,
+      shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.04, shadowRadius: 3, elevation: 2,
     },
     iconBox: {
       width: 52, height: 52, borderRadius: BorderRadius.md,
@@ -148,15 +150,17 @@ export default function MachineSearchScreen({ navigation }: Props) {
           </>
         }
         ItemSeparatorComponent={() => <View style={{ height: Spacing.sm }} />}
-        renderItem={({ item }) => {
+        renderItem={({ item, index }) => {
           const saved = isMachineSaved(item.id);
+          const iconColors = [ACCENTS.coralLight, ACCENTS.tealLight, ACCENTS.purpleLight, ACCENTS.amberLight];
+          const iconBg = C.isDark ? C.primaryLight : iconColors[index % iconColors.length];
           return (
             <TouchableOpacity
               style={styles.card}
               onPress={() => navigation.navigate('MachineDetail', { machineId: item.id })}
               activeOpacity={0.7}
             >
-              <View style={styles.iconBox}>
+              <View style={[styles.iconBox, { backgroundColor: iconBg }]}>
                 <Text style={styles.icon}>{CATEGORY_ICONS[item.category]}</Text>
               </View>
               <View style={styles.cardInfo}>

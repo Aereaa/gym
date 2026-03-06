@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { KeyPoint } from '../data/types';
-import { useTheme, Typography, Spacing, BorderRadius } from '../theme';
+import { useTheme, ACCENTS, Typography, Spacing, BorderRadius } from '../theme';
 
 interface Props {
   keyPoint: KeyPoint;
@@ -21,6 +21,11 @@ export default function KeyPointCard({ keyPoint }: Props) {
           marginBottom: Spacing.sm,
           borderWidth: 1,
           borderColor: C.border,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.04,
+          shadowRadius: 3,
+          elevation: 2,
         },
         row: {
           flexDirection: 'row',
@@ -30,7 +35,7 @@ export default function KeyPointCard({ keyPoint }: Props) {
           width: 36,
           height: 36,
           borderRadius: BorderRadius.sm,
-          backgroundColor: 'rgba(245,158,11,0.15)',
+          backgroundColor: C.isDark ? 'rgba(245,158,11,0.15)' : ACCENTS.tealLight,
           alignItems: 'center',
           justifyContent: 'center',
           marginRight: Spacing.sm,
@@ -70,7 +75,7 @@ export default function KeyPointCard({ keyPoint }: Props) {
     >
       <View style={styles.row}>
         <View style={styles.iconBox}>
-          <Text style={styles.icon}>💡</Text>
+          <Text style={styles.icon}>{'\uD83D\uDCA1'}</Text>
         </View>
         <View style={styles.content}>
           <Text style={styles.title}>{keyPoint.title}</Text>

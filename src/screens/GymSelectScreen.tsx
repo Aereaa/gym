@@ -159,7 +159,7 @@ export default function GymSelectScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={C.background} />
+      <StatusBar barStyle={C.isDark ? 'light-content' : 'dark-content'} backgroundColor={C.background} />
 
       {/* Hero */}
       <View style={styles.hero}>

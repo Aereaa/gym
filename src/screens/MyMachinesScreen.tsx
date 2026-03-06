@@ -6,7 +6,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from '../navigation/types';
 import { machines } from '../data';
 import { useUserData } from '../contexts/UserDataContext';
-import { useTheme, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
+import { useTheme, ACCENTS, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'MyMachines'>;
 
@@ -28,6 +28,11 @@ export default function MyMachinesScreen({ navigation }: Props) {
       borderWidth: 1,
       borderColor: C.border,
       overflow: 'hidden',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.04,
+      shadowRadius: 3,
+      elevation: 2,
     },
     cardMain: { flexDirection: 'row', alignItems: 'center', padding: Spacing.md },
     iconBox: {
@@ -69,14 +74,17 @@ export default function MyMachinesScreen({ navigation }: Props) {
             </Text>
           </View>
         }
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => {
+          const iconColors = [ACCENTS.coralLight, ACCENTS.tealLight, ACCENTS.purpleLight, ACCENTS.amberLight];
+          const iconBg = C.isDark ? C.primaryLight : iconColors[index % iconColors.length];
+          return (
           <View style={styles.card}>
             <TouchableOpacity
               style={styles.cardMain}
               onPress={() => navigation.navigate('MachineDetail', { machineId: item.id })}
               activeOpacity={0.7}
             >
-              <View style={styles.iconBox}>
+              <View style={[styles.iconBox, { backgroundColor: iconBg }]}>
                 <Text style={styles.icon}>{CATEGORY_ICONS[item.category]}</Text>
               </View>
               <View style={styles.info}>
@@ -93,7 +101,8 @@ export default function MyMachinesScreen({ navigation }: Props) {
               <Text style={styles.unsaveBtnText}>{'\uD83D\uDDD1'} Remove</Text>
             </TouchableOpacity>
           </View>
-        )}
+          );
+        }}
       />
     </SafeAreaView>
   );

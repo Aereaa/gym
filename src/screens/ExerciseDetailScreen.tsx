@@ -10,7 +10,7 @@ import {
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ExploreStackParamList } from '../navigation/types';
 import { exercises, machines } from '../data';
-import { useTheme, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
+import { useTheme, Typography, Spacing, BorderRadius, PageContainer, ACCENTS } from '../theme';
 import MuscleMap from '../components/MuscleMap';
 import StepCard from '../components/StepCard';
 import KeyPointCard from '../components/KeyPointCard';
@@ -37,21 +37,35 @@ export default function ExerciseDetailScreen({ route, navigation }: Props) {
     hero: {
       ...PageContainer,
       backgroundColor: C.surface,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.08,
+      shadowRadius: 8,
+      elevation: 3,
     },
     videoPlaceholder: {
       height: 220,
-      backgroundColor: C.background,
+      backgroundColor: '#1a1a2e',
       alignItems: 'center',
       justifyContent: 'center',
+      borderBottomWidth: 0,
+    },
+    videoPlayButton: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      backgroundColor: 'rgba(255,255,255,0.15)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: Spacing.sm,
     },
     videoIcon: {
-      fontSize: 40,
+      fontSize: 28,
       color: '#FFFFFF',
-      marginBottom: Spacing.sm,
     },
     videoLabel: {
       ...Typography.bodySmall,
-      color: 'rgba(255,255,255,0.6)',
+      color: 'rgba(255,255,255,0.5)',
     },
     heroContent: {
       padding: Spacing.md,
@@ -117,6 +131,11 @@ export default function ExerciseDetailScreen({ route, navigation }: Props) {
       borderRadius: BorderRadius.sm,
       padding: Spacing.sm,
       alignItems: 'center',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 4,
+      elevation: 1,
     },
     statValue: {
       ...Typography.h3,
@@ -196,20 +215,20 @@ export default function ExerciseDetailScreen({ route, navigation }: Props) {
       borderRadius: BorderRadius.full,
     },
     muscleTagPrimary: {
-      backgroundColor: C.muscleActive,
+      backgroundColor: ACCENTS.coralLight,
     },
     muscleTagSecondary: {
-      backgroundColor: C.primaryLight,
+      backgroundColor: ACCENTS.tealLight,
     },
     muscleTagTextPrimary: {
       ...Typography.caption,
-      color: C.textOnPrimary,
+      color: ACCENTS.coral,
       fontWeight: '600',
       textTransform: 'capitalize',
     },
     muscleTagTextSecondary: {
       ...Typography.caption,
-      color: C.primary,
+      color: ACCENTS.tealDark,
       fontWeight: '600',
       textTransform: 'capitalize',
     },
@@ -252,7 +271,9 @@ export default function ExerciseDetailScreen({ route, navigation }: Props) {
         <View style={styles.hero}>
           {/* Video placeholder */}
           <View style={styles.videoPlaceholder}>
-            <Text style={styles.videoIcon}>{'\u25B6'}</Text>
+            <View style={styles.videoPlayButton}>
+              <Text style={styles.videoIcon}>{'\u25B6'}</Text>
+            </View>
             <Text style={styles.videoLabel}>Exercise demo video</Text>
           </View>
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { CommonMistake } from '../data/types';
-import { useTheme, Typography, Spacing, BorderRadius } from '../theme';
+import { useTheme, ACCENTS, Typography, Spacing, BorderRadius } from '../theme';
 
 interface Props {
   mistake: CommonMistake;
@@ -16,18 +16,18 @@ export default function MistakeCard({ mistake }: Props) {
         card: {
           flexDirection: 'row',
           alignItems: 'flex-start',
-          backgroundColor: C.surfaceAlt,
+          backgroundColor: C.isDark ? C.surfaceAlt : ACCENTS.amberLight,
           borderRadius: BorderRadius.md,
           padding: Spacing.md,
           marginBottom: Spacing.sm,
           borderWidth: 1,
-          borderColor: C.border,
+          borderColor: C.isDark ? C.border : '#FDEDB7',
         },
         iconBox: {
           width: 36,
           height: 36,
           borderRadius: BorderRadius.sm,
-          backgroundColor: 'rgba(245,158,11,0.15)',
+          backgroundColor: C.isDark ? 'rgba(245,158,11,0.15)' : ACCENTS.amberLight,
           alignItems: 'center',
           justifyContent: 'center',
           marginRight: Spacing.sm,
@@ -41,12 +41,12 @@ export default function MistakeCard({ mistake }: Props) {
         },
         title: {
           ...Typography.h4,
-          color: C.warning,
+          color: C.isDark ? C.warning : '#92400E',
           marginBottom: Spacing.xs,
         },
         description: {
           ...Typography.bodySmall,
-          color: C.textSecondary,
+          color: C.isDark ? C.textSecondary : '#92400E',
           lineHeight: 20,
         },
       }),
@@ -56,7 +56,7 @@ export default function MistakeCard({ mistake }: Props) {
   return (
     <View style={styles.card}>
       <View style={styles.iconBox}>
-        <Text style={styles.icon}>⚠️</Text>
+        <Text style={styles.icon}>{'\u26A0\uFE0F'}</Text>
       </View>
       <View style={styles.content}>
         <Text style={styles.title}>{mistake.title}</Text>
