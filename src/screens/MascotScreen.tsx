@@ -3,7 +3,7 @@ import {
   View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity,
   TextInput,
 } from 'react-native';
-import { Colors, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
+import { useTheme, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
 import {
   useMascot, getPhaseLabel, getMascotEmoji, getMoodMessage, getPhase,
 } from '../contexts/MascotContext';
@@ -27,6 +27,7 @@ const PHASE_COLORS = {
 export default function MascotScreen() {
   const { mascot, level, phase, mood, xpProgress, dailyCheckIn, renameMascot } = useMascot();
   const { workoutLogs, goals } = useUserData();
+  const { colors: C } = useTheme();
   const [editing, setEditing] = useState(false);
   const [nameInput, setNameInput] = useState(mascot.name);
   const [checkedIn, setCheckedIn] = useState(false);
@@ -46,6 +47,120 @@ export default function MascotScreen() {
   const moodMsg = getMoodMessage(mood, mascot.name);
   const phaseColor = PHASE_COLORS[phase];
   const moodColor = MOOD_COLORS[mood];
+
+  const styles = React.useMemo(() => StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.background },
+    page: { ...PageContainer, padding: Spacing.md, paddingTop: Spacing.lg },
+
+    screenTitle: { ...Typography.h1, color: C.textPrimary, marginBottom: Spacing.lg },
+
+    // Mascot card
+    mascotCard: {
+      backgroundColor: C.surface,
+      borderRadius: BorderRadius.lg,
+      padding: Spacing.lg,
+      marginBottom: Spacing.md,
+      borderWidth: 2,
+      alignItems: 'center',
+    },
+    mascotCircle: {
+      width: 120, height: 120, borderRadius: 60,
+      alignItems: 'center', justifyContent: 'center',
+      marginBottom: Spacing.md,
+    },
+    mascotEmoji: { fontSize: 64 },
+
+    mascotName: { ...Typography.h2, color: C.textPrimary, textAlign: 'center' },
+    tapToEdit: { ...Typography.caption, color: C.textDisabled, textAlign: 'center', marginTop: 2 },
+
+    nameEditRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, marginBottom: Spacing.sm },
+    nameInput: {
+      ...Typography.h3, color: C.textPrimary, textAlign: 'center',
+      borderBottomWidth: 2, borderBottomColor: C.primary, paddingVertical: 4,
+      minWidth: 120,
+    },
+    nameSaveBtn: { backgroundColor: C.primary, borderRadius: BorderRadius.md, paddingHorizontal: Spacing.md, paddingVertical: 6 },
+    nameSaveText: { ...Typography.button, color: C.textOnPrimary, fontSize: 13 },
+
+    phaseBadge: {
+      borderRadius: BorderRadius.full, paddingHorizontal: Spacing.md, paddingVertical: 4,
+      marginTop: Spacing.sm,
+    },
+    phaseBadgeText: { ...Typography.label, color: '#fff', fontWeight: '700' },
+
+    moodBubble: {
+      flexDirection: 'row', alignItems: 'center', gap: Spacing.xs,
+      borderWidth: 1, borderRadius: BorderRadius.full,
+      paddingHorizontal: Spacing.md, paddingVertical: 6,
+      marginTop: Spacing.md,
+    },
+    moodDot: { width: 8, height: 8, borderRadius: 4 },
+    moodText: { ...Typography.bodySmall, fontWeight: '500' },
+
+    // Cards
+    card: {
+      backgroundColor: C.surface,
+      borderRadius: BorderRadius.lg,
+      padding: Spacing.md,
+      marginBottom: Spacing.md,
+      borderWidth: 1,
+      borderColor: C.border,
+    },
+    cardTitle: { ...Typography.h4, color: C.textPrimary, marginBottom: Spacing.md },
+
+    // XP bar
+    xpBarOuter: {
+      height: 12, backgroundColor: C.surfaceAlt, borderRadius: 6,
+      overflow: 'hidden', marginBottom: Spacing.sm,
+    },
+    xpBarInner: { height: '100%', borderRadius: 6 },
+    xpRow: { flexDirection: 'row', justifyContent: 'space-between' },
+    xpText: { ...Typography.label, color: C.textPrimary },
+    xpTotal: { ...Typography.caption, color: C.textSecondary },
+    xpHint: { ...Typography.caption, color: C.textSecondary, marginTop: 4 },
+
+    // Stats
+    statsRow: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.md },
+    statCard: {
+      flex: 1, backgroundColor: C.surface, borderRadius: BorderRadius.lg,
+      paddingVertical: Spacing.md, alignItems: 'center', borderWidth: 1, borderColor: C.border,
+    },
+    statEmoji: { fontSize: 20, marginBottom: 4 },
+    statValue: { ...Typography.h2, color: C.primary },
+    statLabel: { ...Typography.caption, color: C.textSecondary, marginTop: 2, textTransform: 'uppercase', letterSpacing: 0.5 },
+
+    // XP sources
+    xpSource: {
+      flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
+      paddingVertical: Spacing.sm, borderTopWidth: 1, borderTopColor: C.border,
+    },
+    xpSourceIcon: { fontSize: 22 },
+    xpSourceText: { ...Typography.label, color: C.textPrimary },
+    xpSourceDetail: { ...Typography.caption, color: C.textSecondary, marginTop: 1 },
+    xpSourceCount: { ...Typography.label, color: C.primary, fontWeight: '700' },
+    checkInDone: { ...Typography.caption, color: C.success },
+
+    // Phases
+    phaseRow: {
+      flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
+      paddingVertical: Spacing.sm, paddingHorizontal: Spacing.sm,
+      borderRadius: BorderRadius.md,
+    },
+    phaseEmoji: { fontSize: 24 },
+    phaseRowLabel: { ...Typography.body, color: C.textPrimary },
+    phaseRowRange: { ...Typography.caption, color: C.textSecondary },
+    activeTag: { borderRadius: BorderRadius.full, paddingHorizontal: 10, paddingVertical: 2 },
+    activeTagText: { ...Typography.caption, color: '#fff', fontWeight: '700', fontSize: 10 },
+
+    // Mood info
+    moodInfo: { ...Typography.bodySmall, color: C.textSecondary, marginBottom: Spacing.sm },
+    moodRow: {
+      flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
+      paddingVertical: 4,
+    },
+    moodInfoDot: { fontSize: 18 },
+    moodInfoText: { ...Typography.bodySmall, color: C.textPrimary, flex: 1 },
+  }), [C]);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -221,117 +336,3 @@ export default function MascotScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.background },
-  page: { ...PageContainer, padding: Spacing.md, paddingTop: Spacing.lg },
-
-  screenTitle: { ...Typography.h1, color: Colors.textPrimary, marginBottom: Spacing.lg },
-
-  // Mascot card
-  mascotCard: {
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.lg,
-    marginBottom: Spacing.md,
-    borderWidth: 2,
-    alignItems: 'center',
-  },
-  mascotCircle: {
-    width: 120, height: 120, borderRadius: 60,
-    alignItems: 'center', justifyContent: 'center',
-    marginBottom: Spacing.md,
-  },
-  mascotEmoji: { fontSize: 64 },
-
-  mascotName: { ...Typography.h2, color: Colors.textPrimary, textAlign: 'center' },
-  tapToEdit: { ...Typography.caption, color: Colors.textDisabled, textAlign: 'center', marginTop: 2 },
-
-  nameEditRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, marginBottom: Spacing.sm },
-  nameInput: {
-    ...Typography.h3, color: Colors.textPrimary, textAlign: 'center',
-    borderBottomWidth: 2, borderBottomColor: Colors.primary, paddingVertical: 4,
-    minWidth: 120,
-  },
-  nameSaveBtn: { backgroundColor: Colors.primary, borderRadius: BorderRadius.md, paddingHorizontal: Spacing.md, paddingVertical: 6 },
-  nameSaveText: { ...Typography.button, color: Colors.textOnPrimary, fontSize: 13 },
-
-  phaseBadge: {
-    borderRadius: BorderRadius.full, paddingHorizontal: Spacing.md, paddingVertical: 4,
-    marginTop: Spacing.sm,
-  },
-  phaseBadgeText: { ...Typography.label, color: '#fff', fontWeight: '700' },
-
-  moodBubble: {
-    flexDirection: 'row', alignItems: 'center', gap: Spacing.xs,
-    borderWidth: 1, borderRadius: BorderRadius.full,
-    paddingHorizontal: Spacing.md, paddingVertical: 6,
-    marginTop: Spacing.md,
-  },
-  moodDot: { width: 8, height: 8, borderRadius: 4 },
-  moodText: { ...Typography.bodySmall, fontWeight: '500' },
-
-  // Cards
-  card: {
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.md,
-    marginBottom: Spacing.md,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  cardTitle: { ...Typography.h4, color: Colors.textPrimary, marginBottom: Spacing.md },
-
-  // XP bar
-  xpBarOuter: {
-    height: 12, backgroundColor: Colors.surfaceAlt, borderRadius: 6,
-    overflow: 'hidden', marginBottom: Spacing.sm,
-  },
-  xpBarInner: { height: '100%', borderRadius: 6 },
-  xpRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  xpText: { ...Typography.label, color: Colors.textPrimary },
-  xpTotal: { ...Typography.caption, color: Colors.textSecondary },
-  xpHint: { ...Typography.caption, color: Colors.textSecondary, marginTop: 4 },
-
-  // Stats
-  statsRow: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.md },
-  statCard: {
-    flex: 1, backgroundColor: Colors.surface, borderRadius: BorderRadius.lg,
-    paddingVertical: Spacing.md, alignItems: 'center', borderWidth: 1, borderColor: Colors.border,
-  },
-  statEmoji: { fontSize: 20, marginBottom: 4 },
-  statValue: { ...Typography.h2, color: Colors.primary },
-  statLabel: { ...Typography.caption, color: Colors.textSecondary, marginTop: 2, textTransform: 'uppercase', letterSpacing: 0.5 },
-
-  // XP sources
-  xpSource: {
-    flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
-    paddingVertical: Spacing.sm, borderTopWidth: 1, borderTopColor: Colors.border,
-  },
-  xpSourceIcon: { fontSize: 22 },
-  xpSourceText: { ...Typography.label, color: Colors.textPrimary },
-  xpSourceDetail: { ...Typography.caption, color: Colors.textSecondary, marginTop: 1 },
-  xpSourceCount: { ...Typography.label, color: Colors.primary, fontWeight: '700' },
-  checkInDone: { ...Typography.caption, color: Colors.success },
-
-  // Phases
-  phaseRow: {
-    flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
-    paddingVertical: Spacing.sm, paddingHorizontal: Spacing.sm,
-    borderRadius: BorderRadius.md,
-  },
-  phaseEmoji: { fontSize: 24 },
-  phaseRowLabel: { ...Typography.body, color: Colors.textPrimary },
-  phaseRowRange: { ...Typography.caption, color: Colors.textSecondary },
-  activeTag: { borderRadius: BorderRadius.full, paddingHorizontal: 10, paddingVertical: 2 },
-  activeTagText: { ...Typography.caption, color: '#fff', fontWeight: '700', fontSize: 10 },
-
-  // Mood info
-  moodInfo: { ...Typography.bodySmall, color: Colors.textSecondary, marginBottom: Spacing.sm },
-  moodRow: {
-    flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
-    paddingVertical: 4,
-  },
-  moodInfoDot: { fontSize: 18 },
-  moodInfoText: { ...Typography.bodySmall, color: Colors.textPrimary, flex: 1 },
-});

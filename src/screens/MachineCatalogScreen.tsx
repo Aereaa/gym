@@ -7,12 +7,12 @@ import { ExploreStackParamList } from '../navigation/types';
 import { gyms, machines } from '../data';
 import { Machine } from '../data/types';
 import { useAuth } from '../contexts/AuthContext';
-import { Colors, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
+import { useTheme, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
 
 type Props = NativeStackScreenProps<ExploreStackParamList, 'MachineCatalog'>;
 
 const CATEGORY_ICONS: Record<string, string> = {
-  cardio: '🏃', strength: '💪', cable: '🔗', 'free-weights': '🏋️', bodyweight: '🤸',
+  cardio: '\u{1F3C3}', strength: '\u{1F4AA}', cable: '\u{1F517}', 'free-weights': '\u{1F3CB}\uFE0F', bodyweight: '\u{1F938}',
 };
 const CATEGORY_LABELS: Record<string, string> = {
   all: 'All', cardio: 'Cardio', strength: 'Strength', cable: 'Cable', 'free-weights': 'Free weights', bodyweight: 'Bodyweight',
@@ -22,6 +22,7 @@ type CategoryFilter = 'all' | Machine['category'];
 const FILTERS: CategoryFilter[] = ['all', 'cardio', 'strength', 'cable', 'free-weights', 'bodyweight'];
 
 export default function MachineCatalogScreen({ route, navigation }: Props) {
+  const { colors: C } = useTheme();
   const { user } = useAuth();
   const gymId = route.params?.gymId ?? user?.gymId ?? gyms[0]?.id;
   const gym = gyms.find((g) => g.id === gymId);
@@ -30,6 +31,49 @@ export default function MachineCatalogScreen({ route, navigation }: Props) {
   const gymMachines = machines.filter((m) => gym?.machineIds.includes(m.id));
   const availableFilters = FILTERS.filter((f) => f === 'all' || gymMachines.some((m) => m.category === f));
   const filtered = activeFilter === 'all' ? gymMachines : gymMachines.filter((m) => m.category === activeFilter);
+
+  const styles = React.useMemo(() => StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.background },
+    page: { ...PageContainer, padding: Spacing.md, paddingBottom: Spacing.xxl },
+
+    header: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: Spacing.md },
+    gymName: { ...Typography.h1, color: C.textPrimary },
+    subtitle: { ...Typography.bodySmall, color: C.textSecondary, marginTop: 2 },
+    changeBtn: {
+      paddingVertical: Spacing.xs, paddingHorizontal: Spacing.md,
+      borderRadius: BorderRadius.full, borderWidth: 1, borderColor: C.primary,
+    },
+    changeBtnText: { ...Typography.label, color: C.primary },
+
+    filters: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm, marginBottom: Spacing.lg },
+    chip: {
+      paddingVertical: Spacing.xs, paddingHorizontal: Spacing.md,
+      borderRadius: BorderRadius.full, backgroundColor: C.surface,
+      borderWidth: 1, borderColor: C.border,
+    },
+    chipActive: { backgroundColor: C.primary, borderColor: C.primary },
+    chipText: { ...Typography.label, color: C.textSecondary },
+    chipTextActive: { color: C.textOnPrimary },
+
+    card: {
+      flexDirection: 'row', alignItems: 'center',
+      backgroundColor: C.surface, borderRadius: BorderRadius.lg,
+      padding: Spacing.md, borderWidth: 1, borderColor: C.border,
+    },
+    iconBox: {
+      width: 52, height: 52, borderRadius: BorderRadius.md,
+      backgroundColor: C.primaryLight, alignItems: 'center', justifyContent: 'center', marginRight: Spacing.md,
+    },
+    icon: { fontSize: 24 },
+    cardInfo: { flex: 1 },
+    machineName: { ...Typography.h4, color: C.textPrimary, marginBottom: 2 },
+    machineCategory: { ...Typography.caption, color: C.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 },
+    exerciseCount: { ...Typography.bodySmall, color: C.accent, fontWeight: '600' },
+    chevron: { fontSize: 22, color: C.textDisabled, marginLeft: Spacing.sm },
+
+    empty: { alignItems: 'center', marginTop: Spacing.xxl },
+    emptyText: { ...Typography.body, color: C.textSecondary },
+  }), [C]);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -86,7 +130,7 @@ export default function MachineCatalogScreen({ route, navigation }: Props) {
                 {item.exerciseIds.length} exercise{item.exerciseIds.length !== 1 ? 's' : ''}
               </Text>
             </View>
-            <Text style={styles.chevron}>›</Text>
+            <Text style={styles.chevron}>{'\u203A'}</Text>
           </TouchableOpacity>
         )}
         ListEmptyComponent={
@@ -98,46 +142,3 @@ export default function MachineCatalogScreen({ route, navigation }: Props) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.background },
-  page: { ...PageContainer, padding: Spacing.md, paddingBottom: Spacing.xxl },
-
-  header: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: Spacing.md },
-  gymName: { ...Typography.h1, color: Colors.textPrimary },
-  subtitle: { ...Typography.bodySmall, color: Colors.textSecondary, marginTop: 2 },
-  changeBtn: {
-    paddingVertical: Spacing.xs, paddingHorizontal: Spacing.md,
-    borderRadius: BorderRadius.full, borderWidth: 1, borderColor: Colors.primary,
-  },
-  changeBtnText: { ...Typography.label, color: Colors.primary },
-
-  filters: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm, marginBottom: Spacing.lg },
-  chip: {
-    paddingVertical: Spacing.xs, paddingHorizontal: Spacing.md,
-    borderRadius: BorderRadius.full, backgroundColor: Colors.surface,
-    borderWidth: 1, borderColor: Colors.border,
-  },
-  chipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  chipText: { ...Typography.label, color: Colors.textSecondary },
-  chipTextActive: { color: Colors.textOnPrimary },
-
-  card: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: Colors.surface, borderRadius: BorderRadius.lg,
-    padding: Spacing.md, borderWidth: 1, borderColor: Colors.border,
-  },
-  iconBox: {
-    width: 52, height: 52, borderRadius: BorderRadius.md,
-    backgroundColor: Colors.primaryLight, alignItems: 'center', justifyContent: 'center', marginRight: Spacing.md,
-  },
-  icon: { fontSize: 24 },
-  cardInfo: { flex: 1 },
-  machineName: { ...Typography.h4, color: Colors.textPrimary, marginBottom: 2 },
-  machineCategory: { ...Typography.caption, color: Colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 },
-  exerciseCount: { ...Typography.bodySmall, color: Colors.accent, fontWeight: '600' },
-  chevron: { fontSize: 22, color: Colors.textDisabled, marginLeft: Spacing.sm },
-
-  empty: { alignItems: 'center', marginTop: Spacing.xxl },
-  emptyText: { ...Typography.body, color: Colors.textSecondary },
-});

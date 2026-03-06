@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Svg, { Polyline, Circle, Line, Text as SvgText } from 'react-native-svg';
 import { WorkoutLog } from '../data/types';
-import { Colors, Typography, Spacing, BorderRadius } from '../theme';
+import { useTheme, Typography, Spacing, BorderRadius } from '../theme';
 
 interface Props {
   logs: WorkoutLog[]; // oldest first
@@ -26,6 +26,56 @@ const CHART_W = W - PAD.left - PAD.right;
 const CHART_H = H - PAD.top - PAD.bottom;
 
 export default function ProgressChart({ logs, metric }: Props) {
+  const { colors: C } = useTheme();
+
+  const styles = React.useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          backgroundColor: C.surface,
+          borderRadius: BorderRadius.md,
+          padding: Spacing.md,
+          borderWidth: 1,
+          borderColor: C.border,
+          marginBottom: Spacing.lg,
+        },
+        badgeRow: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: Spacing.sm,
+          marginBottom: Spacing.sm,
+        },
+        badge: {
+          paddingVertical: 4,
+          paddingHorizontal: Spacing.sm,
+          borderRadius: BorderRadius.full,
+        },
+        badgeGood: { backgroundColor: C.accentLight },
+        badgeSame: { backgroundColor: C.surfaceAlt },
+        badgeText: { ...Typography.caption, fontWeight: '700', color: C.accent },
+        badgeLabel: { ...Typography.caption, color: C.textSecondary },
+        axisLabel: {
+          ...Typography.caption,
+          color: C.textSecondary,
+          textAlign: 'center',
+          marginTop: 4,
+        },
+        placeholder: {
+          backgroundColor: C.surfaceAlt,
+          borderRadius: BorderRadius.md,
+          padding: Spacing.lg,
+          alignItems: 'center',
+          marginBottom: Spacing.lg,
+        },
+        placeholderText: {
+          ...Typography.bodySmall,
+          color: C.textSecondary,
+          textAlign: 'center',
+        },
+      }),
+    [C],
+  );
+
   // Only use logs that have data for this metric
   const points = logs
     .map((log) => ({ value: maxMetric(log, metric), date: log.date }))
@@ -78,23 +128,23 @@ export default function ProgressChart({ logs, metric }: Props) {
           const label = (minVal + frac * valRange).toFixed(frac === 0 ? 0 : 1);
           return (
             <React.Fragment key={frac}>
-              <Line x1={PAD.left} y1={y} x2={W - PAD.right} y2={y} stroke={Colors.border} strokeWidth={1} strokeDasharray="4,4" />
-              <SvgText x={PAD.left - 4} y={y + 4} fontSize={10} fill={Colors.textSecondary} textAnchor="end">{label}</SvgText>
+              <Line x1={PAD.left} y1={y} x2={W - PAD.right} y2={y} stroke={C.border} strokeWidth={1} strokeDasharray="4,4" />
+              <SvgText x={PAD.left - 4} y={y + 4} fontSize={10} fill={C.textSecondary} textAnchor="end">{label}</SvgText>
             </React.Fragment>
           );
         })}
 
         {/* Line */}
-        <Polyline points={polylinePoints} fill="none" stroke={Colors.primary} strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
+        <Polyline points={polylinePoints} fill="none" stroke={C.primary} strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
 
         {/* Dots */}
         {points.map((p, i) => (
-          <Circle key={i} cx={toX(i)} cy={toY(p.value)} r={4} fill={Colors.primary} />
+          <Circle key={i} cx={toX(i)} cy={toY(p.value)} r={4} fill={C.primary} />
         ))}
 
         {/* X axis labels */}
         {labelIndices.map((i) => (
-          <SvgText key={i} x={toX(i)} y={H - 4} fontSize={10} fill={Colors.textSecondary} textAnchor="middle">
+          <SvgText key={i} x={toX(i)} y={H - 4} fontSize={10} fill={C.textSecondary} textAnchor="middle">
             {formatDate(points[i].date)}
           </SvgText>
         ))}
@@ -104,47 +154,3 @@ export default function ProgressChart({ logs, metric }: Props) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    marginBottom: Spacing.lg,
-  },
-  badgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-    marginBottom: Spacing.sm,
-  },
-  badge: {
-    paddingVertical: 4,
-    paddingHorizontal: Spacing.sm,
-    borderRadius: BorderRadius.full,
-  },
-  badgeGood: { backgroundColor: Colors.accentLight },
-  badgeSame: { backgroundColor: Colors.surfaceAlt },
-  badgeText: { ...Typography.caption, fontWeight: '700', color: Colors.accent },
-  badgeLabel: { ...Typography.caption, color: Colors.textSecondary },
-  axisLabel: {
-    ...Typography.caption,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    marginTop: 4,
-  },
-  placeholder: {
-    backgroundColor: Colors.surfaceAlt,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.lg,
-    alignItems: 'center',
-    marginBottom: Spacing.lg,
-  },
-  placeholderText: {
-    ...Typography.bodySmall,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-  },
-});

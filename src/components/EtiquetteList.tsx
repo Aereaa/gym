@@ -1,13 +1,52 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { EtiketteRule } from '../data/types';
-import { Colors, Typography, Spacing, BorderRadius } from '../theme';
+import { useTheme, Typography, Spacing, BorderRadius } from '../theme';
 
 interface Props {
   rules: EtiketteRule[];
 }
 
 export default function EtiquetteList({ rules }: Props) {
+  const { colors: C } = useTheme();
+
+  const styles = React.useMemo(
+    () =>
+      StyleSheet.create({
+        title: {
+          ...Typography.h4,
+          color: C.textPrimary,
+          marginBottom: Spacing.xs,
+        },
+        subtitle: {
+          ...Typography.bodySmall,
+          color: C.textSecondary,
+          marginBottom: Spacing.md,
+          lineHeight: 20,
+        },
+        ruleCard: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          backgroundColor: C.surface,
+          borderRadius: BorderRadius.md,
+          padding: Spacing.md,
+          marginBottom: Spacing.sm,
+          borderWidth: 1,
+          borderColor: C.border,
+        },
+        ruleIcon: {
+          fontSize: 22,
+          marginRight: Spacing.md,
+        },
+        ruleText: {
+          ...Typography.body,
+          color: C.textPrimary,
+          flex: 1,
+        },
+      }),
+    [C],
+  );
+
   return (
     <View>
       <Text style={styles.title}>Gym etiquette</Text>
@@ -23,36 +62,3 @@ export default function EtiquetteList({ rules }: Props) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  title: {
-    ...Typography.h4,
-    color: Colors.textPrimary,
-    marginBottom: Spacing.xs,
-  },
-  subtitle: {
-    ...Typography.bodySmall,
-    color: Colors.textSecondary,
-    marginBottom: Spacing.md,
-    lineHeight: 20,
-  },
-  ruleCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    marginBottom: Spacing.sm,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  ruleIcon: {
-    fontSize: 22,
-    marginRight: Spacing.md,
-  },
-  ruleText: {
-    ...Typography.body,
-    color: Colors.textPrimary,
-    flex: 1,
-  },
-});

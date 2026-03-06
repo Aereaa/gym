@@ -8,7 +8,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ExploreStackParamList } from '../navigation/types';
 import { useUserData } from '../contexts/UserDataContext';
 import { WorkoutSet } from '../data/types';
-import { Colors, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
+import { useTheme, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
 
 type Props = NativeStackScreenProps<ExploreStackParamList, 'LogWorkout'>;
 
@@ -18,6 +18,7 @@ interface SetRow {
 }
 
 export default function LogWorkoutScreen({ route, navigation }: Props) {
+  const { colors: C } = useTheme();
   const { exerciseId, exerciseName, machineName } = route.params;
   const { logWorkout } = useUserData();
 
@@ -55,6 +56,100 @@ export default function LogWorkoutScreen({ route, navigation }: Props) {
     navigation.goBack();
   }
 
+  const styles = React.useMemo(() => StyleSheet.create({
+    container: { flex: 1, backgroundColor: C.background },
+    scroll: { ...PageContainer, padding: Spacing.md, paddingBottom: Spacing.xxl },
+    exerciseInfo: {
+      backgroundColor: C.surface,
+      borderRadius: BorderRadius.md,
+      padding: Spacing.md,
+      marginBottom: Spacing.lg,
+      borderWidth: 1,
+      borderColor: C.border,
+    },
+    machineName: { ...Typography.caption, color: C.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5 },
+    exerciseName: { ...Typography.h3, color: C.textPrimary, marginTop: 4, marginBottom: 4 },
+    dateLabel: { ...Typography.bodySmall, color: C.accent },
+    setsSection: {
+      backgroundColor: C.surface,
+      borderRadius: BorderRadius.md,
+      padding: Spacing.md,
+      marginBottom: Spacing.md,
+      borderWidth: 1,
+      borderColor: C.border,
+    },
+    setsHeader: { marginBottom: Spacing.sm },
+    setsTitle: { ...Typography.h4, color: C.textPrimary, marginBottom: Spacing.sm },
+    columnHeaders: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 2 },
+    colHeader: { ...Typography.caption, color: C.textSecondary, textTransform: 'uppercase', flex: 1 },
+    setRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: Spacing.sm,
+      gap: Spacing.sm,
+    },
+    setNumber: {
+      ...Typography.label,
+      color: C.textSecondary,
+      width: 24,
+      textAlign: 'center',
+    },
+    setInput: {
+      flex: 1,
+      height: 44,
+      backgroundColor: C.background,
+      borderWidth: 1,
+      borderColor: C.border,
+      borderRadius: BorderRadius.sm,
+      textAlign: 'center',
+      ...Typography.body,
+      color: C.textPrimary,
+      fontWeight: '600',
+    },
+    removeSetBtn: {
+      width: 32,
+      height: 32,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    removeSetIcon: { fontSize: 20, color: C.error },
+    addSetBtn: {
+      alignItems: 'center',
+      paddingVertical: Spacing.sm,
+      borderTopWidth: 1,
+      borderTopColor: C.border,
+      marginTop: Spacing.xs,
+    },
+    addSetText: { ...Typography.label, color: C.primary },
+    notesSection: { marginBottom: Spacing.lg },
+    notesLabel: { ...Typography.label, color: C.textSecondary, marginBottom: Spacing.xs },
+    notesInput: {
+      backgroundColor: C.surface,
+      borderWidth: 1,
+      borderColor: C.border,
+      borderRadius: BorderRadius.md,
+      padding: Spacing.md,
+      ...Typography.body,
+      color: C.textPrimary,
+      minHeight: 80,
+      textAlignVertical: 'top',
+    },
+    saveBtn: {
+      backgroundColor: C.primary,
+      borderRadius: 12,
+      height: 52,
+      alignItems: 'center',
+      justifyContent: 'center',
+      shadowColor: C.glow,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.5,
+      shadowRadius: 12,
+      elevation: 6,
+    },
+    saveBtnDisabled: { opacity: 0.6 },
+    saveBtnText: { ...Typography.button, color: C.textOnPrimary },
+  }), [C]);
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
@@ -85,7 +180,7 @@ export default function LogWorkoutScreen({ route, navigation }: Props) {
                 value={set.weight}
                 onChangeText={(v) => updateSet(i, 'weight', v)}
                 placeholder="0"
-                placeholderTextColor={Colors.textDisabled}
+                placeholderTextColor={C.textDisabled}
                 keyboardType="decimal-pad"
               />
               <TextInput
@@ -93,7 +188,7 @@ export default function LogWorkoutScreen({ route, navigation }: Props) {
                 value={set.reps}
                 onChangeText={(v) => updateSet(i, 'reps', v)}
                 placeholder="0"
-                placeholderTextColor={Colors.textDisabled}
+                placeholderTextColor={C.textDisabled}
                 keyboardType="number-pad"
               />
               <TouchableOpacity
@@ -101,13 +196,13 @@ export default function LogWorkoutScreen({ route, navigation }: Props) {
                 onPress={() => removeSet(i)}
                 disabled={sets.length === 1}
               >
-                <Text style={[styles.removeSetIcon, sets.length === 1 && { opacity: 0.2 }]}>−</Text>
+                <Text style={[styles.removeSetIcon, sets.length === 1 && { opacity: 0.2 }]}>{'\u2212'}</Text>
               </TouchableOpacity>
             </View>
           ))}
 
           <TouchableOpacity style={styles.addSetBtn} onPress={addSet}>
-            <Text style={styles.addSetText}>＋ Add set</Text>
+            <Text style={styles.addSetText}>{'\uFF0B'} Add set</Text>
           </TouchableOpacity>
         </View>
 
@@ -119,7 +214,7 @@ export default function LogWorkoutScreen({ route, navigation }: Props) {
             value={notes}
             onChangeText={setNotes}
             placeholder="e.g. Felt strong today, increased weight from last time"
-            placeholderTextColor={Colors.textDisabled}
+            placeholderTextColor={C.textDisabled}
             multiline
             numberOfLines={3}
           />
@@ -131,98 +226,9 @@ export default function LogWorkoutScreen({ route, navigation }: Props) {
           onPress={handleSave}
           disabled={saving}
         >
-          <Text style={styles.saveBtnText}>{saving ? 'Saving…' : 'Save workout'}</Text>
+          <Text style={styles.saveBtnText}>{saving ? 'Saving\u2026' : 'Save workout'}</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
-  scroll: { ...PageContainer, padding: Spacing.md, paddingBottom: Spacing.xxl },
-  exerciseInfo: {
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    marginBottom: Spacing.lg,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  machineName: { ...Typography.caption, color: Colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5 },
-  exerciseName: { ...Typography.h3, color: Colors.textPrimary, marginTop: 4, marginBottom: 4 },
-  dateLabel: { ...Typography.bodySmall, color: Colors.accent },
-  setsSection: {
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    marginBottom: Spacing.md,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  setsHeader: { marginBottom: Spacing.sm },
-  setsTitle: { ...Typography.h4, color: Colors.textPrimary, marginBottom: Spacing.sm },
-  columnHeaders: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 2 },
-  colHeader: { ...Typography.caption, color: Colors.textSecondary, textTransform: 'uppercase', flex: 1 },
-  setRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: Spacing.sm,
-    gap: Spacing.sm,
-  },
-  setNumber: {
-    ...Typography.label,
-    color: Colors.textSecondary,
-    width: 24,
-    textAlign: 'center',
-  },
-  setInput: {
-    flex: 1,
-    height: 44,
-    backgroundColor: Colors.background,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: BorderRadius.sm,
-    textAlign: 'center',
-    ...Typography.body,
-    color: Colors.textPrimary,
-    fontWeight: '600',
-  },
-  removeSetBtn: {
-    width: 32,
-    height: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  removeSetIcon: { fontSize: 20, color: Colors.error },
-  addSetBtn: {
-    alignItems: 'center',
-    paddingVertical: Spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-    marginTop: Spacing.xs,
-  },
-  addSetText: { ...Typography.label, color: Colors.primary },
-  notesSection: { marginBottom: Spacing.lg },
-  notesLabel: { ...Typography.label, color: Colors.textSecondary, marginBottom: Spacing.xs },
-  notesInput: {
-    backgroundColor: Colors.surface,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    ...Typography.body,
-    color: Colors.textPrimary,
-    minHeight: 80,
-    textAlignVertical: 'top',
-  },
-  saveBtn: {
-    backgroundColor: Colors.primary,
-    borderRadius: BorderRadius.md,
-    height: 52,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  saveBtnDisabled: { opacity: 0.6 },
-  saveBtnText: { ...Typography.button, color: Colors.textOnPrimary },
-});

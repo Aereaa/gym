@@ -6,14 +6,16 @@ import { RootStackParamList } from './types';
 import GymSelectScreen from '../screens/GymSelectScreen';
 import MainTabs from './MainTabs';
 import { useAuth } from '../contexts/AuthContext';
-import { Colors } from '../theme';
+import { useTheme } from '../theme';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function LoadingScreen() {
+  const { colors: C } = useTheme();
+
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.background }}>
-      <ActivityIndicator size="large" color={Colors.primary} />
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: C.background }}>
+      <ActivityIndicator size="large" color={C.primary} />
     </View>
   );
 }

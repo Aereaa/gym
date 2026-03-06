@@ -10,7 +10,7 @@ import {
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ExploreStackParamList } from '../navigation/types';
 import { exercises, machines } from '../data';
-import { Colors, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
+import { useTheme, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
 import MuscleMap from '../components/MuscleMap';
 import StepCard from '../components/StepCard';
 import KeyPointCard from '../components/KeyPointCard';
@@ -23,10 +23,203 @@ type Props = NativeStackScreenProps<ExploreStackParamList, 'ExerciseDetail'>;
 type Section = 'how-to' | 'muscles' | 'tips' | 'mistakes';
 
 export default function ExerciseDetailScreen({ route, navigation }: Props) {
+  const { colors: C } = useTheme();
   const { exerciseId } = route.params;
   const exercise = exercises.find((e) => e.id === exerciseId);
   const [activeSection, setActiveSection] = useState<Section>('how-to');
   const { isMachineSaved, saveMachine, removeSavedMachine } = useUserData();
+
+  const styles = React.useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: C.background,
+    },
+    hero: {
+      ...PageContainer,
+      backgroundColor: C.surface,
+    },
+    videoPlaceholder: {
+      height: 220,
+      backgroundColor: C.background,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    videoIcon: {
+      fontSize: 40,
+      color: '#FFFFFF',
+      marginBottom: Spacing.sm,
+    },
+    videoLabel: {
+      ...Typography.bodySmall,
+      color: 'rgba(255,255,255,0.6)',
+    },
+    heroContent: {
+      padding: Spacing.md,
+      paddingBottom: Spacing.lg,
+    },
+    exerciseName: {
+      ...Typography.h2,
+      color: C.textPrimary,
+      marginTop: Spacing.sm,
+      marginBottom: Spacing.sm,
+    },
+    exerciseDesc: {
+      ...Typography.body,
+      color: C.textSecondary,
+      marginBottom: Spacing.md,
+    },
+    actionRow: {
+      flexDirection: 'row',
+      gap: Spacing.sm,
+      marginTop: Spacing.md,
+    },
+    logBtn: {
+      flex: 1,
+      backgroundColor: C.primary,
+      borderRadius: 12,
+      height: 52,
+      alignItems: 'center',
+      justifyContent: 'center',
+      shadowColor: C.glow,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.5,
+      shadowRadius: 12,
+      elevation: 6,
+    },
+    logBtnText: {
+      ...Typography.button,
+      color: C.textOnPrimary,
+    },
+    saveBtn: {
+      width: 52,
+      height: 52,
+      backgroundColor: C.surface,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: C.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    saveBtnActive: {
+      backgroundColor: C.primaryLight,
+      borderColor: C.primary,
+    },
+    saveBtnText: {
+      fontSize: 20,
+    },
+    statsRow: {
+      flexDirection: 'row',
+      gap: Spacing.sm,
+    },
+    statBox: {
+      flex: 1,
+      backgroundColor: C.primaryLight,
+      borderRadius: BorderRadius.sm,
+      padding: Spacing.sm,
+      alignItems: 'center',
+    },
+    statValue: {
+      ...Typography.h3,
+      color: C.primary,
+    },
+    statLabel: {
+      ...Typography.caption,
+      color: C.primary,
+      marginTop: 2,
+    },
+    sectionTabs: {
+      ...PageContainer,
+      backgroundColor: C.surface,
+      borderBottomWidth: 1,
+      borderBottomColor: C.border,
+    },
+    sectionTabsContent: {
+      paddingHorizontal: Spacing.md,
+      gap: Spacing.xs,
+    },
+    sectionTab: {
+      paddingVertical: Spacing.sm,
+      paddingHorizontal: Spacing.md,
+      borderBottomWidth: 2,
+      borderBottomColor: 'transparent',
+      marginRight: Spacing.xs,
+    },
+    sectionTabActive: {
+      borderBottomColor: C.primary,
+    },
+    sectionTabLabel: {
+      ...Typography.label,
+      color: C.textSecondary,
+    },
+    sectionTabLabelActive: {
+      color: C.primary,
+      fontWeight: '700',
+    },
+    sectionContent: {
+      ...PageContainer,
+      padding: Spacing.md,
+      paddingBottom: Spacing.xxl,
+    },
+    sectionTitle: {
+      ...Typography.h4,
+      color: C.textPrimary,
+      marginBottom: Spacing.md,
+    },
+    muscleLegend: {
+      flexDirection: 'row',
+      gap: Spacing.md,
+      marginTop: Spacing.md,
+      marginBottom: Spacing.md,
+    },
+    legendItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: Spacing.xs,
+    },
+    legendDot: {
+      width: 12,
+      height: 12,
+      borderRadius: 6,
+    },
+    legendLabel: {
+      ...Typography.bodySmall,
+      color: C.textSecondary,
+    },
+    muscleTagRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: Spacing.xs,
+    },
+    muscleTag: {
+      paddingVertical: 4,
+      paddingHorizontal: Spacing.sm,
+      borderRadius: BorderRadius.full,
+    },
+    muscleTagPrimary: {
+      backgroundColor: C.muscleActive,
+    },
+    muscleTagSecondary: {
+      backgroundColor: C.primaryLight,
+    },
+    muscleTagTextPrimary: {
+      ...Typography.caption,
+      color: C.textOnPrimary,
+      fontWeight: '600',
+      textTransform: 'capitalize',
+    },
+    muscleTagTextSecondary: {
+      ...Typography.caption,
+      color: C.primary,
+      fontWeight: '600',
+      textTransform: 'capitalize',
+    },
+    errorText: {
+      ...Typography.body,
+      color: C.error,
+      textAlign: 'center',
+      marginTop: Spacing.xxl,
+    },
+  }), [C]);
 
   if (!exercise) {
     return (
@@ -59,7 +252,7 @@ export default function ExerciseDetailScreen({ route, navigation }: Props) {
         <View style={styles.hero}>
           {/* Video placeholder */}
           <View style={styles.videoPlaceholder}>
-            <Text style={styles.videoIcon}>▶</Text>
+            <Text style={styles.videoIcon}>{'\u25B6'}</Text>
             <Text style={styles.videoLabel}>Exercise demo video</Text>
           </View>
 
@@ -104,7 +297,7 @@ export default function ExerciseDetailScreen({ route, navigation }: Props) {
                   })
                 }
               >
-                <Text style={styles.logBtnText}>📊  Log workout</Text>
+                <Text style={styles.logBtnText}>{'\u{1F4CA}'}  Log workout</Text>
               </TouchableOpacity>
 
               {machine && (
@@ -112,7 +305,7 @@ export default function ExerciseDetailScreen({ route, navigation }: Props) {
                   style={[styles.saveBtn, machineSaved && styles.saveBtnActive]}
                   onPress={toggleMachineSave}
                 >
-                  <Text style={styles.saveBtnText}>{machineSaved ? '🔖' : '＋'}</Text>
+                  <Text style={styles.saveBtnText}>{machineSaved ? '\u{1F516}' : '\uFF0B'}</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -163,23 +356,23 @@ export default function ExerciseDetailScreen({ route, navigation }: Props) {
               />
               <View style={styles.muscleLegend}>
                 <View style={styles.legendItem}>
-                  <View style={[styles.legendDot, { backgroundColor: Colors.muscleActive }]} />
+                  <View style={[styles.legendDot, { backgroundColor: C.muscleActive }]} />
                   <Text style={styles.legendLabel}>Primary</Text>
                 </View>
                 <View style={styles.legendItem}>
-                  <View style={[styles.legendDot, { backgroundColor: Colors.muscleSecondary }]} />
+                  <View style={[styles.legendDot, { backgroundColor: C.muscleSecondary }]} />
                   <Text style={styles.legendLabel}>Secondary</Text>
                 </View>
               </View>
               <View style={styles.muscleTagRow}>
                 {exercise.primaryMuscles.map((m) => (
                   <View key={m} style={[styles.muscleTag, styles.muscleTagPrimary]}>
-                    <Text style={styles.muscleTagText}>{m}</Text>
+                    <Text style={styles.muscleTagTextPrimary}>{m}</Text>
                   </View>
                 ))}
                 {exercise.secondaryMuscles.map((m) => (
                   <View key={m} style={[styles.muscleTag, styles.muscleTagSecondary]}>
-                    <Text style={[styles.muscleTagText, { color: Colors.primary }]}>{m}</Text>
+                    <Text style={styles.muscleTagTextSecondary}>{m}</Text>
                   </View>
                 ))}
               </View>
@@ -208,184 +401,3 @@ export default function ExerciseDetailScreen({ route, navigation }: Props) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  hero: {
-    ...PageContainer,
-    backgroundColor: Colors.surface,
-  },
-  videoPlaceholder: {
-    height: 220,
-    backgroundColor: '#111',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  videoIcon: {
-    fontSize: 40,
-    color: '#FFFFFF',
-    marginBottom: Spacing.sm,
-  },
-  videoLabel: {
-    ...Typography.bodySmall,
-    color: 'rgba(255,255,255,0.6)',
-  },
-  heroContent: {
-    padding: Spacing.md,
-    paddingBottom: Spacing.lg,
-  },
-  exerciseName: {
-    ...Typography.h2,
-    color: Colors.textPrimary,
-    marginTop: Spacing.sm,
-    marginBottom: Spacing.sm,
-  },
-  exerciseDesc: {
-    ...Typography.body,
-    color: Colors.textSecondary,
-    marginBottom: Spacing.md,
-  },
-  actionRow: {
-    flexDirection: 'row',
-    gap: Spacing.sm,
-    marginTop: Spacing.md,
-  },
-  logBtn: {
-    flex: 1,
-    backgroundColor: Colors.primary,
-    borderRadius: BorderRadius.md,
-    paddingVertical: Spacing.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logBtnText: {
-    ...Typography.button,
-    color: Colors.textOnPrimary,
-  },
-  saveBtn: {
-    width: 48,
-    height: 44,
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.md,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  saveBtnActive: {
-    backgroundColor: Colors.primaryLight,
-    borderColor: Colors.primary,
-  },
-  saveBtnText: {
-    fontSize: 20,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    gap: Spacing.sm,
-  },
-  statBox: {
-    flex: 1,
-    backgroundColor: Colors.primaryLight,
-    borderRadius: BorderRadius.sm,
-    padding: Spacing.sm,
-    alignItems: 'center',
-  },
-  statValue: {
-    ...Typography.h3,
-    color: Colors.primary,
-  },
-  statLabel: {
-    ...Typography.caption,
-    color: Colors.primary,
-    marginTop: 2,
-  },
-  sectionTabs: {
-    ...PageContainer,
-    backgroundColor: Colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-  },
-  sectionTabsContent: {
-    paddingHorizontal: Spacing.md,
-    gap: Spacing.xs,
-  },
-  sectionTab: {
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-    marginRight: Spacing.xs,
-  },
-  sectionTabActive: {
-    borderBottomColor: Colors.primary,
-  },
-  sectionTabLabel: {
-    ...Typography.label,
-    color: Colors.textSecondary,
-  },
-  sectionTabLabelActive: {
-    color: Colors.primary,
-    fontWeight: '700',
-  },
-  sectionContent: {
-    ...PageContainer,
-    padding: Spacing.md,
-    paddingBottom: Spacing.xxl,
-  },
-  sectionTitle: {
-    ...Typography.h4,
-    color: Colors.textPrimary,
-    marginBottom: Spacing.md,
-  },
-  muscleLegend: {
-    flexDirection: 'row',
-    gap: Spacing.md,
-    marginTop: Spacing.md,
-    marginBottom: Spacing.md,
-  },
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.xs,
-  },
-  legendDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  legendLabel: {
-    ...Typography.bodySmall,
-    color: Colors.textSecondary,
-  },
-  muscleTagRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: Spacing.xs,
-  },
-  muscleTag: {
-    paddingVertical: 4,
-    paddingHorizontal: Spacing.sm,
-    borderRadius: BorderRadius.full,
-  },
-  muscleTagPrimary: {
-    backgroundColor: Colors.muscleActive,
-  },
-  muscleTagSecondary: {
-    backgroundColor: Colors.primaryLight,
-  },
-  muscleTagText: {
-    ...Typography.caption,
-    color: Colors.textOnPrimary,
-    fontWeight: '600',
-    textTransform: 'capitalize',
-  },
-  errorText: {
-    ...Typography.body,
-    color: Colors.error,
-    textAlign: 'center',
-    marginTop: Spacing.xxl,
-  },
-});

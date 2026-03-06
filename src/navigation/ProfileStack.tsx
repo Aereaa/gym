@@ -10,19 +10,21 @@ import MachineDetailScreen from '../screens/MachineDetailScreen';
 import ExerciseDetailScreen from '../screens/ExerciseDetailScreen';
 import LogWorkoutScreen from '../screens/LogWorkoutScreen';
 import ProgressScreen from '../screens/ProgressScreen';
-import { Colors } from '../theme';
+import { useTheme } from '../theme';
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
 
 export default function ProfileStack() {
+  const { colors: C } = useTheme();
+
   return (
     <Stack.Navigator
       screenOptions={{
-        headerStyle: { backgroundColor: Colors.surface },
-        headerTintColor: Colors.primary,
-        headerTitleStyle: { color: Colors.textPrimary, fontWeight: '600' },
+        headerStyle: { backgroundColor: C.surface },
+        headerTintColor: C.primary,
+        headerTitleStyle: { color: C.textPrimary, fontWeight: '600' },
         headerShadowVisible: false,
-        contentStyle: { backgroundColor: Colors.background },
+        contentStyle: { backgroundColor: C.background },
       }}
     >
       <Stack.Screen name="ProfileHome" component={ProfileScreen} options={{ headerShown: false }} />

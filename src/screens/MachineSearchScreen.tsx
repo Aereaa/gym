@@ -8,12 +8,12 @@ import { SearchStackParamList } from '../navigation/types';
 import { machines } from '../data';
 import { Machine } from '../data/types';
 import { useUserData } from '../contexts/UserDataContext';
-import { Colors, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
+import { useTheme, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
 
 type Props = NativeStackScreenProps<SearchStackParamList, 'MachineSearch'>;
 
 const CATEGORY_ICONS: Record<string, string> = {
-  cardio: '🏃', strength: '💪', cable: '🔗', 'free-weights': '🏋️', bodyweight: '🤸',
+  cardio: '\u{1F3C3}', strength: '\u{1F4AA}', cable: '\u{1F517}', 'free-weights': '\u{1F3CB}\uFE0F', bodyweight: '\u{1F938}',
 };
 const CATEGORY_LABELS: Record<string, string> = {
   cardio: 'Cardio', strength: 'Strength', cable: 'Cable', 'free-weights': 'Free weights', bodyweight: 'Bodyweight',
@@ -23,6 +23,7 @@ type CategoryFilter = 'all' | Machine['category'];
 const FILTERS: CategoryFilter[] = ['all', 'cardio', 'strength', 'cable', 'free-weights'];
 
 export default function MachineSearchScreen({ navigation }: Props) {
+  const { colors: C } = useTheme();
   const { saveMachine, removeSavedMachine, isMachineSaved } = useUserData();
   const [query, setQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<CategoryFilter>('all');
@@ -45,6 +46,61 @@ export default function MachineSearchScreen({ navigation }: Props) {
     }
   }
 
+  const styles = React.useMemo(() => StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.background },
+    page: { ...PageContainer, padding: Spacing.md, paddingBottom: Spacing.xxl },
+
+    title: { ...Typography.h1, color: C.textPrimary },
+    subtitle: { ...Typography.bodySmall, color: C.textSecondary, marginTop: 4, marginBottom: Spacing.md },
+
+    searchBar: {
+      flexDirection: 'row', alignItems: 'center',
+      backgroundColor: C.surface, borderRadius: BorderRadius.md,
+      borderWidth: 1, borderColor: C.border, paddingHorizontal: Spacing.md, height: 48,
+      marginBottom: Spacing.md,
+    },
+    searchIcon: { fontSize: 16, marginRight: Spacing.sm },
+    searchInput: { flex: 1, ...Typography.body, color: C.textPrimary },
+    clearBtn: { fontSize: 16, color: C.textSecondary, padding: Spacing.xs },
+
+    filters: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm, marginBottom: Spacing.lg },
+    chip: {
+      paddingVertical: Spacing.xs, paddingHorizontal: Spacing.md,
+      borderRadius: BorderRadius.full, backgroundColor: C.surface,
+      borderWidth: 1, borderColor: C.border,
+    },
+    chipActive: { backgroundColor: C.primary, borderColor: C.primary },
+    chipText: { ...Typography.label, color: C.textSecondary },
+    chipTextActive: { color: C.textOnPrimary },
+
+    card: {
+      flexDirection: 'row', alignItems: 'center',
+      backgroundColor: C.surface, borderRadius: BorderRadius.lg,
+      padding: Spacing.md, borderWidth: 1, borderColor: C.border,
+    },
+    iconBox: {
+      width: 52, height: 52, borderRadius: BorderRadius.md,
+      backgroundColor: C.primaryLight, alignItems: 'center', justifyContent: 'center', marginRight: Spacing.md,
+    },
+    icon: { fontSize: 24 },
+    cardInfo: { flex: 1 },
+    machineName: { ...Typography.h4, color: C.textPrimary, marginBottom: 2 },
+    machineCategory: { ...Typography.caption, color: C.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 },
+    exerciseCount: { ...Typography.bodySmall, color: C.accent, fontWeight: '600' },
+
+    saveBtn: {
+      paddingVertical: Spacing.xs, paddingHorizontal: Spacing.md,
+      borderRadius: BorderRadius.full, borderWidth: 1, borderColor: C.border, marginLeft: Spacing.sm,
+    },
+    saveBtnActive: { backgroundColor: C.primaryLight, borderColor: C.primary },
+    saveBtnText: { ...Typography.label, color: C.textSecondary },
+    saveBtnTextActive: { color: C.primary },
+
+    empty: { alignItems: 'center', marginTop: Spacing.xxl },
+    emptyTitle: { ...Typography.h4, color: C.textSecondary },
+    emptySub: { ...Typography.bodySmall, color: C.textDisabled, marginTop: Spacing.xs },
+  }), [C]);
+
   return (
     <SafeAreaView style={styles.safe}>
       <FlatList
@@ -58,19 +114,19 @@ export default function MachineSearchScreen({ navigation }: Props) {
 
             {/* Search bar */}
             <View style={styles.searchBar}>
-              <Text style={styles.searchIcon}>🔍</Text>
+              <Text style={styles.searchIcon}>{'\u{1F50D}'}</Text>
               <TextInput
                 style={styles.searchInput}
                 value={query}
                 onChangeText={setQuery}
                 placeholder="Search machines..."
-                placeholderTextColor={Colors.textDisabled}
+                placeholderTextColor={C.textDisabled}
                 autoCapitalize="none"
                 autoCorrect={false}
               />
               {query.length > 0 && (
                 <TouchableOpacity onPress={() => setQuery('')}>
-                  <Text style={styles.clearBtn}>✕</Text>
+                  <Text style={styles.clearBtn}>{'\u2715'}</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -131,58 +187,3 @@ export default function MachineSearchScreen({ navigation }: Props) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.background },
-  page: { ...PageContainer, padding: Spacing.md, paddingBottom: Spacing.xxl },
-
-  title: { ...Typography.h1, color: Colors.textPrimary },
-  subtitle: { ...Typography.bodySmall, color: Colors.textSecondary, marginTop: 4, marginBottom: Spacing.md },
-
-  searchBar: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: Colors.surface, borderRadius: BorderRadius.md,
-    borderWidth: 1, borderColor: Colors.border, paddingHorizontal: Spacing.md, height: 48,
-    marginBottom: Spacing.md,
-  },
-  searchIcon: { fontSize: 16, marginRight: Spacing.sm },
-  searchInput: { flex: 1, ...Typography.body, color: Colors.textPrimary },
-  clearBtn: { fontSize: 16, color: Colors.textSecondary, padding: Spacing.xs },
-
-  filters: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm, marginBottom: Spacing.lg },
-  chip: {
-    paddingVertical: Spacing.xs, paddingHorizontal: Spacing.md,
-    borderRadius: BorderRadius.full, backgroundColor: Colors.surface,
-    borderWidth: 1, borderColor: Colors.border,
-  },
-  chipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
-  chipText: { ...Typography.label, color: Colors.textSecondary },
-  chipTextActive: { color: Colors.textOnPrimary },
-
-  card: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: Colors.surface, borderRadius: BorderRadius.lg,
-    padding: Spacing.md, borderWidth: 1, borderColor: Colors.border,
-  },
-  iconBox: {
-    width: 52, height: 52, borderRadius: BorderRadius.md,
-    backgroundColor: Colors.primaryLight, alignItems: 'center', justifyContent: 'center', marginRight: Spacing.md,
-  },
-  icon: { fontSize: 24 },
-  cardInfo: { flex: 1 },
-  machineName: { ...Typography.h4, color: Colors.textPrimary, marginBottom: 2 },
-  machineCategory: { ...Typography.caption, color: Colors.textSecondary, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 },
-  exerciseCount: { ...Typography.bodySmall, color: Colors.accent, fontWeight: '600' },
-
-  saveBtn: {
-    paddingVertical: Spacing.xs, paddingHorizontal: Spacing.md,
-    borderRadius: BorderRadius.full, borderWidth: 1, borderColor: Colors.border, marginLeft: Spacing.sm,
-  },
-  saveBtnActive: { backgroundColor: Colors.primaryLight, borderColor: Colors.primary },
-  saveBtnText: { ...Typography.label, color: Colors.textSecondary },
-  saveBtnTextActive: { color: Colors.primary },
-
-  empty: { alignItems: 'center', marginTop: Spacing.xxl },
-  emptyTitle: { ...Typography.h4, color: Colors.textSecondary },
-  emptySub: { ...Typography.bodySmall, color: Colors.textDisabled, marginTop: Spacing.xs },
-});

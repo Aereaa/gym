@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Colors, Typography, Spacing, BorderRadius } from '../theme';
+import { useTheme, Typography, Spacing, BorderRadius } from '../theme';
 
 interface Props {
   stepNumber: number;
@@ -8,6 +8,47 @@ interface Props {
 }
 
 export default function StepCard({ stepNumber, instruction }: Props) {
+  const { colors: C } = useTheme();
+
+  const styles = React.useMemo(
+    () =>
+      StyleSheet.create({
+        card: {
+          flexDirection: 'row',
+          alignItems: 'flex-start',
+          backgroundColor: C.surface,
+          borderRadius: BorderRadius.md,
+          padding: Spacing.md,
+          marginBottom: Spacing.sm,
+          borderWidth: 1,
+          borderColor: C.border,
+        },
+        numberBox: {
+          width: 32,
+          height: 32,
+          borderRadius: 16,
+          backgroundColor: C.primary,
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginRight: Spacing.md,
+          flexShrink: 0,
+          marginTop: 2,
+        },
+        number: {
+          ...Typography.label,
+          color: C.textOnPrimary,
+          fontWeight: '700',
+        },
+        instruction: {
+          ...Typography.body,
+          color: C.textPrimary,
+          flex: 1,
+          lineHeight: 24,
+        },
+      }),
+    [C],
+  );
+
   return (
     <View style={styles.card}>
       <View style={styles.numberBox}>
@@ -17,38 +58,3 @@ export default function StepCard({ stepNumber, instruction }: Props) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    marginBottom: Spacing.sm,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  numberBox: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: Spacing.md,
-    flexShrink: 0,
-    marginTop: 2,
-  },
-  number: {
-    ...Typography.label,
-    color: Colors.textOnPrimary,
-    fontWeight: '700',
-  },
-  instruction: {
-    ...Typography.body,
-    color: Colors.textPrimary,
-    flex: 1,
-    lineHeight: 24,
-  },
-});

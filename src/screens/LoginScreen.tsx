@@ -6,12 +6,13 @@ import {
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from '../navigation/types';
 import { useAuth } from '../contexts/AuthContext';
-import { Colors, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
+import { useTheme, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Login'>;
 
 export default function LoginScreen({ navigation }: Props) {
   const { login } = useAuth();
+  const { colors: C } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -33,6 +34,52 @@ export default function LoginScreen({ navigation }: Props) {
     }
   }
 
+  const styles = React.useMemo(() => StyleSheet.create({
+    container: { flex: 1, backgroundColor: C.background },
+    scroll: { ...PageContainer, flexGrow: 1, paddingHorizontal: Spacing.lg, paddingBottom: Spacing.xxl },
+    hero: { alignItems: 'center', paddingTop: Spacing.xxl, paddingBottom: Spacing.xl },
+    logo: { fontSize: 56, marginBottom: Spacing.md },
+    title: { ...Typography.h1, color: C.textPrimary, textAlign: 'center' },
+    subtitle: { ...Typography.body, color: C.textSecondary, marginTop: Spacing.sm, textAlign: 'center' },
+    form: { gap: Spacing.xs },
+    errorBox: {
+      backgroundColor: 'rgba(239,68,68,0.15)',
+      borderRadius: BorderRadius.sm,
+      padding: Spacing.md,
+      marginBottom: Spacing.sm,
+    },
+    errorText: { ...Typography.bodySmall, color: C.error },
+    label: { ...Typography.label, color: C.textSecondary, marginTop: Spacing.md, marginBottom: Spacing.xs },
+    input: {
+      backgroundColor: C.surface,
+      borderWidth: 1,
+      borderColor: C.border,
+      borderRadius: BorderRadius.md,
+      paddingHorizontal: Spacing.md,
+      height: 52,
+      ...Typography.body,
+      color: C.textPrimary,
+    },
+    btn: {
+      backgroundColor: C.primary,
+      borderRadius: 12,
+      height: 52,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: Spacing.lg,
+      shadowColor: C.glow,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.5,
+      shadowRadius: 12,
+      elevation: 6,
+    },
+    btnDisabled: { opacity: 0.6 },
+    btnText: { ...Typography.button, color: C.textOnPrimary },
+    footer: { flexDirection: 'row', justifyContent: 'center', marginTop: Spacing.xl },
+    footerText: { ...Typography.body, color: C.textSecondary },
+    footerLink: { ...Typography.body, color: C.primary, fontWeight: '600' },
+  }), [C]);
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -42,7 +89,7 @@ export default function LoginScreen({ navigation }: Props) {
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
           {/* Hero */}
           <View style={styles.hero}>
-            <Text style={styles.logo}>💪</Text>
+            <Text style={styles.logo}>{'\uD83D\uDCAA'}</Text>
             <Text style={styles.title}>Welcome back</Text>
             <Text style={styles.subtitle}>Log in to continue your journey</Text>
           </View>
@@ -61,7 +108,7 @@ export default function LoginScreen({ navigation }: Props) {
               value={email}
               onChangeText={setEmail}
               placeholder="you@example.com"
-              placeholderTextColor={Colors.textDisabled}
+              placeholderTextColor={C.textDisabled}
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
@@ -73,7 +120,7 @@ export default function LoginScreen({ navigation }: Props) {
               value={password}
               onChangeText={setPassword}
               placeholder="••••••••"
-              placeholderTextColor={Colors.textDisabled}
+              placeholderTextColor={C.textDisabled}
               secureTextEntry
               autoCapitalize="none"
             />
@@ -84,7 +131,7 @@ export default function LoginScreen({ navigation }: Props) {
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator color={Colors.textOnPrimary} />
+                <ActivityIndicator color={C.textOnPrimary} />
               ) : (
                 <Text style={styles.btnText}>Log in</Text>
               )}
@@ -103,44 +150,3 @@ export default function LoginScreen({ navigation }: Props) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
-  scroll: { ...PageContainer, flexGrow: 1, paddingHorizontal: Spacing.lg, paddingBottom: Spacing.xxl },
-  hero: { alignItems: 'center', paddingTop: Spacing.xxl, paddingBottom: Spacing.xl },
-  logo: { fontSize: 56, marginBottom: Spacing.md },
-  title: { ...Typography.h1, color: Colors.textPrimary, textAlign: 'center' },
-  subtitle: { ...Typography.body, color: Colors.textSecondary, marginTop: Spacing.sm, textAlign: 'center' },
-  form: { gap: Spacing.xs },
-  errorBox: {
-    backgroundColor: '#FEE2E2',
-    borderRadius: BorderRadius.sm,
-    padding: Spacing.md,
-    marginBottom: Spacing.sm,
-  },
-  errorText: { ...Typography.bodySmall, color: Colors.error },
-  label: { ...Typography.label, color: Colors.textSecondary, marginTop: Spacing.md, marginBottom: Spacing.xs },
-  input: {
-    backgroundColor: Colors.surface,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: BorderRadius.md,
-    paddingHorizontal: Spacing.md,
-    height: 52,
-    ...Typography.body,
-    color: Colors.textPrimary,
-  },
-  btn: {
-    backgroundColor: Colors.primary,
-    borderRadius: BorderRadius.md,
-    height: 52,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: Spacing.lg,
-  },
-  btnDisabled: { opacity: 0.6 },
-  btnText: { ...Typography.button, color: Colors.textOnPrimary },
-  footer: { flexDirection: 'row', justifyContent: 'center', marginTop: Spacing.xl },
-  footerText: { ...Typography.body, color: Colors.textSecondary },
-  footerLink: { ...Typography.body, color: Colors.primary, fontWeight: '600' },
-});

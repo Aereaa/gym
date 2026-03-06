@@ -1,35 +1,25 @@
+// Legacy static Colors export — kept for backward compatibility.
+// Screens/components should use useTheme() from ThemeContext for dynamic theming.
 export const Colors = {
-  // Primary brand – confident blue
   primary: '#2563EB',
-  primaryLight: '#DBEAFE',
+  primaryLight: 'rgba(37,99,235,0.15)',
   primaryDark: '#1D4ED8',
-
-  // Accent – energetic but calm
   accent: '#10B981',
-  accentLight: '#D1FAE5',
-
-  // Backgrounds
-  background: '#F9FAFB',
-  surface: '#FFFFFF',
-  surfaceAlt: '#F3F4F6',
-
-  // Text
-  textPrimary: '#111827',
-  textSecondary: '#6B7280',
-  textDisabled: '#D1D5DB',
+  accentLight: 'rgba(16,185,129,0.15)',
+  background: '#0C0C12',
+  surface: '#111118',
+  surfaceAlt: '#18181F',
+  textPrimary: '#F0F0F5',
+  textSecondary: '#9CA3AF',
+  textDisabled: '#4B5563',
   textOnPrimary: '#FFFFFF',
-
-  // Semantic
   error: '#EF4444',
   warning: '#F59E0B',
   success: '#10B981',
-
-  // Muscle diagram
   muscleActive: '#2563EB',
   muscleSecondary: '#93C5FD',
-  muscleInactive: '#E5E7EB',
-
-  // Borders
-  border: '#E5E7EB',
+  muscleInactive: '#1F1F2A',
+  border: 'rgba(255,255,255,0.07)',
   borderFocus: '#2563EB',
+  glow: 'rgba(37,99,235,0.4)',
 } as const;

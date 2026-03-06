@@ -5,19 +5,21 @@ import MachineCatalogScreen from '../screens/MachineCatalogScreen';
 import MachineDetailScreen from '../screens/MachineDetailScreen';
 import ExerciseDetailScreen from '../screens/ExerciseDetailScreen';
 import LogWorkoutScreen from '../screens/LogWorkoutScreen';
-import { Colors } from '../theme';
+import { useTheme } from '../theme';
 
 const Stack = createNativeStackNavigator<ExploreStackParamList>();
 
-const sharedOptions = {
-  headerStyle: { backgroundColor: Colors.surface },
-  headerTintColor: Colors.primary,
-  headerTitleStyle: { color: Colors.textPrimary, fontWeight: '600' as const },
-  headerShadowVisible: false,
-  contentStyle: { backgroundColor: Colors.background },
-};
-
 export default function ExploreStack() {
+  const { colors: C } = useTheme();
+
+  const sharedOptions = {
+    headerStyle: { backgroundColor: C.surface },
+    headerTintColor: C.primary,
+    headerTitleStyle: { color: C.textPrimary, fontWeight: '600' as const },
+    headerShadowVisible: false,
+    contentStyle: { backgroundColor: C.background },
+  };
+
   return (
     <Stack.Navigator screenOptions={sharedOptions}>
       <Stack.Screen name="MachineCatalog" component={MachineCatalogScreen} options={{ headerShown: false }} />

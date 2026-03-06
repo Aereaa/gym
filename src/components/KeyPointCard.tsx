@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { KeyPoint } from '../data/types';
-import { Colors, Typography, Spacing, BorderRadius } from '../theme';
+import { useTheme, Typography, Spacing, BorderRadius } from '../theme';
 
 interface Props {
   keyPoint: KeyPoint;
@@ -9,6 +9,58 @@ interface Props {
 
 export default function KeyPointCard({ keyPoint }: Props) {
   const [expanded, setExpanded] = useState(false);
+  const { colors: C } = useTheme();
+
+  const styles = React.useMemo(
+    () =>
+      StyleSheet.create({
+        card: {
+          backgroundColor: C.surface,
+          borderRadius: BorderRadius.md,
+          padding: Spacing.md,
+          marginBottom: Spacing.sm,
+          borderWidth: 1,
+          borderColor: C.border,
+        },
+        row: {
+          flexDirection: 'row',
+          alignItems: 'flex-start',
+        },
+        iconBox: {
+          width: 36,
+          height: 36,
+          borderRadius: BorderRadius.sm,
+          backgroundColor: 'rgba(245,158,11,0.15)',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginRight: Spacing.sm,
+          flexShrink: 0,
+        },
+        icon: {
+          fontSize: 18,
+        },
+        content: {
+          flex: 1,
+        },
+        title: {
+          ...Typography.h4,
+          color: C.textPrimary,
+        },
+        description: {
+          ...Typography.body,
+          color: C.textSecondary,
+          marginTop: Spacing.sm,
+          lineHeight: 24,
+        },
+        chevron: {
+          fontSize: 14,
+          color: C.textSecondary,
+          marginLeft: Spacing.sm,
+          marginTop: 4,
+        },
+      }),
+    [C],
+  );
 
   return (
     <TouchableOpacity
@@ -26,55 +78,8 @@ export default function KeyPointCard({ keyPoint }: Props) {
             <Text style={styles.description}>{keyPoint.description}</Text>
           )}
         </View>
-        <Text style={styles.chevron}>{expanded ? '∧' : '∨'}</Text>
+        <Text style={styles.chevron}>{expanded ? '\u2227' : '\u2228'}</Text>
       </View>
     </TouchableOpacity>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    marginBottom: Spacing.sm,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  iconBox: {
-    width: 36,
-    height: 36,
-    borderRadius: BorderRadius.sm,
-    backgroundColor: '#FEF9C3',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: Spacing.sm,
-    flexShrink: 0,
-  },
-  icon: {
-    fontSize: 18,
-  },
-  content: {
-    flex: 1,
-  },
-  title: {
-    ...Typography.h4,
-    color: Colors.textPrimary,
-  },
-  description: {
-    ...Typography.body,
-    color: Colors.textSecondary,
-    marginTop: Spacing.sm,
-    lineHeight: 24,
-  },
-  chevron: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    marginLeft: Spacing.sm,
-    marginTop: 4,
-  },
-});

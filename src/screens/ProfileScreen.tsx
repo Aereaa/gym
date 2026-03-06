@@ -10,7 +10,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useUserData } from '../contexts/UserDataContext';
 import { useMascot, getMascotEmoji, getPhaseLabel } from '../contexts/MascotContext';
 import { gyms } from '../data';
-import { Colors, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
+import { useTheme, THEME_META, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'ProfileHome'>;
 
@@ -18,6 +18,7 @@ export default function ProfileScreen({ navigation }: Props) {
   const { user, logout, isGuest } = useAuth();
   const { savedMachineIds, goals, addGoal, toggleGoal, workoutLogs } = useUserData();
   const { mascot, level, phase, mood } = useMascot();
+  const { colors: C, themeName, setTheme } = useTheme();
   const [goalText, setGoalText] = useState('');
 
   const gym = user?.gymId ? gyms.find((g) => g.id === user.gymId) : null;
@@ -59,12 +60,162 @@ export default function ProfileScreen({ navigation }: Props) {
     setGoalText('');
   }
 
+  const styles = React.useMemo(() => StyleSheet.create({
+    safe: { flex: 1, backgroundColor: C.background },
+    page: { ...PageContainer, padding: Spacing.md, paddingTop: Spacing.lg },
+
+    // Header
+    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: Spacing.lg },
+    screenTitle: { ...Typography.h1, color: C.textPrimary },
+    logoutBtn: { paddingVertical: Spacing.xs, paddingHorizontal: Spacing.md, borderRadius: BorderRadius.full, borderWidth: 1, borderColor: C.border },
+    logoutText: { ...Typography.label, color: C.textSecondary },
+
+    // Cards
+    card: {
+      backgroundColor: C.surface,
+      borderRadius: BorderRadius.lg,
+      padding: Spacing.md,
+      marginBottom: Spacing.md,
+      borderWidth: 1,
+      borderColor: C.border,
+    },
+    cardHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: Spacing.md },
+    cardTitle: { ...Typography.h4, color: C.textPrimary },
+    seeAll: { ...Typography.label, color: C.primary },
+
+    // Guest
+    guestInner: { alignItems: 'center', paddingVertical: Spacing.md },
+    guestTitle: { ...Typography.h3, color: C.textPrimary, marginTop: Spacing.md },
+    guestSub: { ...Typography.body, color: C.textSecondary, textAlign: 'center', marginTop: Spacing.xs, maxWidth: 300 },
+    guestBtns: { flexDirection: 'row', gap: Spacing.sm, marginTop: Spacing.lg },
+
+    // User
+    userRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+    avatarLg: {
+      width: 56, height: 56, borderRadius: 28,
+      backgroundColor: C.primaryLight, alignItems: 'center', justifyContent: 'center',
+    },
+    avatarLetter: { fontSize: 24, fontWeight: '700', color: C.primary },
+    userName: { ...Typography.h3, color: C.textPrimary },
+    userMeta: { ...Typography.bodySmall, color: C.textSecondary, marginTop: 2 },
+    userGym: { ...Typography.bodySmall, color: C.accent, fontWeight: '500', marginTop: 2 },
+
+    // Buttons
+    btnPrimary: {
+      backgroundColor: C.primary,
+      borderRadius: 12,
+      height: 48,
+      paddingHorizontal: Spacing.lg,
+      alignItems: 'center',
+      justifyContent: 'center',
+      shadowColor: C.glow,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.5,
+      shadowRadius: 12,
+      elevation: 6,
+    },
+    btnPrimaryText: { ...Typography.button, color: C.textOnPrimary },
+    btnOutline: {
+      borderRadius: 12,
+      height: 48,
+      paddingHorizontal: Spacing.lg,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: C.primary,
+    },
+    btnOutlineText: { ...Typography.button, color: C.primary },
+    btnOutlineSm: { borderRadius: 12, paddingVertical: Spacing.xs, paddingHorizontal: Spacing.md, borderWidth: 1, borderColor: C.primary, marginTop: Spacing.sm },
+    btnOutlineSmText: { ...Typography.label, color: C.primary },
+
+    // Mascot mini
+    mascotMini: {
+      backgroundColor: C.surface, borderRadius: BorderRadius.lg,
+      padding: Spacing.md, marginBottom: Spacing.md,
+      borderWidth: 1, borderColor: C.primary,
+      flexDirection: 'row', alignItems: 'center',
+    },
+    mascotMiniName: { ...Typography.h4, color: C.textPrimary },
+    mascotMiniInfo: { ...Typography.caption, color: C.textSecondary, marginTop: 2 },
+
+    // Theme picker
+    themeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
+    themeBtn: {
+      flex: 1,
+      minWidth: '40%' as unknown as number,
+      borderRadius: 12,
+      borderWidth: 2,
+      paddingVertical: Spacing.sm,
+      paddingHorizontal: Spacing.sm,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: C.surfaceAlt,
+    },
+    themeSwatch: { width: 28, height: 28, borderRadius: 14, marginBottom: Spacing.xs },
+    themeLabel: { ...Typography.caption, color: C.textSecondary, fontWeight: '500' },
+    themeCheck: { ...Typography.caption, color: C.primary, fontWeight: '700', marginTop: 2 },
+
+    // Stats
+    statsRow: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.md },
+    statCard: {
+      flex: 1, backgroundColor: C.surface, borderRadius: BorderRadius.lg,
+      paddingVertical: Spacing.md, alignItems: 'center', borderWidth: 1, borderColor: C.border,
+    },
+    statValue: { ...Typography.h2, color: C.primary },
+    statLabel: { ...Typography.caption, color: C.textSecondary, marginTop: 2, textTransform: 'uppercase', letterSpacing: 0.5 },
+
+    // Goals
+    goalInput: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.sm },
+    goalTextInput: {
+      flex: 1, backgroundColor: C.background, borderWidth: 1, borderColor: C.border,
+      borderRadius: BorderRadius.md, paddingHorizontal: Spacing.md, height: 44,
+      ...Typography.body, color: C.textPrimary,
+    },
+    goalAddBtn: {
+      width: 44, height: 44, backgroundColor: C.primary, borderRadius: BorderRadius.md,
+      alignItems: 'center', justifyContent: 'center',
+    },
+    goalAddText: { fontSize: 22, color: C.textOnPrimary, fontWeight: '600' },
+    goalRow: {
+      flexDirection: 'row', alignItems: 'center', paddingVertical: Spacing.sm,
+      borderTopWidth: 1, borderTopColor: C.border,
+    },
+    checkbox: { marginRight: Spacing.sm },
+    checkboxInner: {
+      width: 22, height: 22, borderRadius: 11,
+      borderWidth: 2, borderColor: C.border,
+    },
+    goalText: { ...Typography.body, color: C.textPrimary, flex: 1 },
+    completedNote: { ...Typography.bodySmall, color: C.accent, marginTop: Spacing.sm, fontWeight: '500' },
+    emptyHint: { ...Typography.bodySmall, color: C.textSecondary, paddingVertical: Spacing.xs },
+    emptyCard: { alignItems: 'center', paddingVertical: Spacing.sm },
+
+    // Menu items
+    menuItem: {
+      flexDirection: 'row', alignItems: 'center', paddingVertical: Spacing.sm,
+      borderTopWidth: 1, borderTopColor: C.border,
+    },
+    menuIcon: { fontSize: 18, marginRight: Spacing.sm },
+    menuText: { ...Typography.body, color: C.textPrimary, flex: 1 },
+    menuArrow: { fontSize: 20, color: C.textDisabled, marginLeft: Spacing.sm },
+
+    // Progress
+    progressRow: {
+      flexDirection: 'row', alignItems: 'center', paddingVertical: Spacing.sm,
+      borderTopWidth: 1, borderTopColor: C.border, gap: Spacing.sm,
+    },
+    progressName: { ...Typography.label, color: C.textPrimary },
+    progressMeta: { ...Typography.caption, color: C.textSecondary, marginTop: 2 },
+    progressStat: { ...Typography.caption, color: C.textSecondary },
+    progressBest: { ...Typography.caption, color: C.primary, fontWeight: '600', marginTop: 2 },
+  }), [C]);
+
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.page}>
 
-          {/* ── Header ────────────────────────────────── */}
+          {/* Header */}
           <View style={styles.header}>
             <Text style={styles.screenTitle}>Profile</Text>
             {!isGuest && (
@@ -74,7 +225,7 @@ export default function ProfileScreen({ navigation }: Props) {
             )}
           </View>
 
-          {/* ── User card ─────────────────────────────── */}
+          {/* User card */}
           {isGuest ? (
             <View style={styles.card}>
               <View style={styles.guestInner}>
@@ -108,7 +259,7 @@ export default function ProfileScreen({ navigation }: Props) {
             </View>
           )}
 
-          {/* ── Mascot mini ───────────────────────────── */}
+          {/* Mascot mini */}
           <TouchableOpacity
             style={styles.mascotMini}
             onPress={() => navigation.getParent()?.navigate('Mascot')}
@@ -121,7 +272,29 @@ export default function ProfileScreen({ navigation }: Props) {
             <Text style={styles.menuArrow}>&rsaquo;</Text>
           </TouchableOpacity>
 
-          {/* ── Stats ─────────────────────────────────── */}
+          {/* Theme picker */}
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Theme</Text>
+            <View style={styles.themeRow}>
+              {THEME_META.map(t => (
+                <TouchableOpacity
+                  key={t.key}
+                  style={[
+                    styles.themeBtn,
+                    { borderColor: themeName === t.key ? t.swatch : C.border },
+                    themeName === t.key && { backgroundColor: t.swatch + '18' },
+                  ]}
+                  onPress={() => setTheme(t.key)}
+                >
+                  <View style={[styles.themeSwatch, { backgroundColor: t.swatch }]} />
+                  <Text style={styles.themeLabel}>{t.label}</Text>
+                  {themeName === t.key && <Text style={styles.themeCheck}>{'\u2713'}</Text>}
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          {/* Stats */}
           <View style={styles.statsRow}>
             <View style={styles.statCard}>
               <Text style={styles.statValue}>{savedMachineIds.length}</Text>
@@ -137,7 +310,7 @@ export default function ProfileScreen({ navigation }: Props) {
             </View>
           </View>
 
-          {/* ── Goals ─────────────────────────────────── */}
+          {/* Goals */}
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>My Goals</Text>
@@ -152,7 +325,7 @@ export default function ProfileScreen({ navigation }: Props) {
                 value={goalText}
                 onChangeText={setGoalText}
                 placeholder="Add a goal — e.g. Squat 80 kg"
-                placeholderTextColor={Colors.textDisabled}
+                placeholderTextColor={C.textDisabled}
                 onSubmitEditing={handleAddGoal}
                 returnKeyType="done"
               />
@@ -187,7 +360,7 @@ export default function ProfileScreen({ navigation }: Props) {
             )}
           </View>
 
-          {/* ── My Machines ───────────────────────────── */}
+          {/* My Machines */}
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>My Machines</Text>
@@ -208,9 +381,9 @@ export default function ProfileScreen({ navigation }: Props) {
               </View>
             ) : (
               <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('MyMachines')}>
-                <Text style={styles.menuIcon}>📌</Text>
+                <Text style={styles.menuIcon}>{'\uD83D\uDCCC'}</Text>
                 <Text style={styles.menuText}>{savedMachineIds.length} saved machine{savedMachineIds.length !== 1 ? 's' : ''}</Text>
-                <Text style={styles.menuArrow}>›</Text>
+                <Text style={styles.menuArrow}>{'\u203A'}</Text>
               </TouchableOpacity>
             )}
 
@@ -218,13 +391,13 @@ export default function ProfileScreen({ navigation }: Props) {
               style={styles.menuItem}
               onPress={() => navigation.getParent()?.navigate('Search')}
             >
-              <Text style={styles.menuIcon}>🔍</Text>
+              <Text style={styles.menuIcon}>{'\uD83D\uDD0D'}</Text>
               <Text style={styles.menuText}>Browse & add machines</Text>
-              <Text style={styles.menuArrow}>›</Text>
+              <Text style={styles.menuArrow}>{'\u203A'}</Text>
             </TouchableOpacity>
           </View>
 
-          {/* ── Progress ──────────────────────────────── */}
+          {/* Progress */}
           {trackedExercises.length > 0 && (
             <View style={styles.card}>
               <View style={styles.cardHeader}>
@@ -246,7 +419,7 @@ export default function ProfileScreen({ navigation }: Props) {
                       <Text style={styles.progressBest}>Best: {data.bestWeight} kg</Text>
                     )}
                   </View>
-                  <Text style={styles.menuArrow}>›</Text>
+                  <Text style={styles.menuArrow}>{'\u203A'}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -258,116 +431,3 @@ export default function ProfileScreen({ navigation }: Props) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.background },
-  page: { ...PageContainer, padding: Spacing.md, paddingTop: Spacing.lg },
-
-  // Header
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: Spacing.lg },
-  screenTitle: { ...Typography.h1, color: Colors.textPrimary },
-  logoutBtn: { paddingVertical: Spacing.xs, paddingHorizontal: Spacing.md, borderRadius: BorderRadius.full, borderWidth: 1, borderColor: Colors.border },
-  logoutText: { ...Typography.label, color: Colors.textSecondary },
-
-  // Cards
-  card: {
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.md,
-    marginBottom: Spacing.md,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  cardHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: Spacing.md },
-  cardTitle: { ...Typography.h4, color: Colors.textPrimary },
-  seeAll: { ...Typography.label, color: Colors.primary },
-
-  // Guest
-  guestInner: { alignItems: 'center', paddingVertical: Spacing.md },
-  guestTitle: { ...Typography.h3, color: Colors.textPrimary, marginTop: Spacing.md },
-  guestSub: { ...Typography.body, color: Colors.textSecondary, textAlign: 'center', marginTop: Spacing.xs, maxWidth: 300 },
-  guestBtns: { flexDirection: 'row', gap: Spacing.sm, marginTop: Spacing.lg },
-
-  // User
-  userRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  avatarLg: {
-    width: 56, height: 56, borderRadius: 28,
-    backgroundColor: Colors.primaryLight, alignItems: 'center', justifyContent: 'center',
-  },
-  avatarLetter: { fontSize: 24, fontWeight: '700', color: Colors.primary },
-  userName: { ...Typography.h3, color: Colors.textPrimary },
-  userMeta: { ...Typography.bodySmall, color: Colors.textSecondary, marginTop: 2 },
-  userGym: { ...Typography.bodySmall, color: Colors.accent, fontWeight: '500', marginTop: 2 },
-
-  // Buttons
-  btnPrimary: { backgroundColor: Colors.primary, borderRadius: BorderRadius.md, paddingVertical: 10, paddingHorizontal: Spacing.lg },
-  btnPrimaryText: { ...Typography.button, color: Colors.textOnPrimary },
-  btnOutline: { borderRadius: BorderRadius.md, paddingVertical: 10, paddingHorizontal: Spacing.lg, borderWidth: 1, borderColor: Colors.primary },
-  btnOutlineText: { ...Typography.button, color: Colors.primary },
-  btnOutlineSm: { borderRadius: BorderRadius.md, paddingVertical: Spacing.xs, paddingHorizontal: Spacing.md, borderWidth: 1, borderColor: Colors.primary, marginTop: Spacing.sm },
-  btnOutlineSmText: { ...Typography.label, color: Colors.primary },
-
-  // Mascot mini
-  mascotMini: {
-    backgroundColor: Colors.surface, borderRadius: BorderRadius.lg,
-    padding: Spacing.md, marginBottom: Spacing.md,
-    borderWidth: 1, borderColor: Colors.primary,
-    flexDirection: 'row', alignItems: 'center',
-  },
-  mascotMiniName: { ...Typography.h4, color: Colors.textPrimary },
-  mascotMiniInfo: { ...Typography.caption, color: Colors.textSecondary, marginTop: 2 },
-
-  // Stats
-  statsRow: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.md },
-  statCard: {
-    flex: 1, backgroundColor: Colors.surface, borderRadius: BorderRadius.lg,
-    paddingVertical: Spacing.md, alignItems: 'center', borderWidth: 1, borderColor: Colors.border,
-  },
-  statValue: { ...Typography.h2, color: Colors.primary },
-  statLabel: { ...Typography.caption, color: Colors.textSecondary, marginTop: 2, textTransform: 'uppercase', letterSpacing: 0.5 },
-
-  // Goals
-  goalInput: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.sm },
-  goalTextInput: {
-    flex: 1, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border,
-    borderRadius: BorderRadius.md, paddingHorizontal: Spacing.md, height: 44,
-    ...Typography.body, color: Colors.textPrimary,
-  },
-  goalAddBtn: {
-    width: 44, height: 44, backgroundColor: Colors.primary, borderRadius: BorderRadius.md,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  goalAddText: { fontSize: 22, color: Colors.textOnPrimary, fontWeight: '600' },
-  goalRow: {
-    flexDirection: 'row', alignItems: 'center', paddingVertical: Spacing.sm,
-    borderTopWidth: 1, borderTopColor: Colors.border,
-  },
-  checkbox: { marginRight: Spacing.sm },
-  checkboxInner: {
-    width: 22, height: 22, borderRadius: 11,
-    borderWidth: 2, borderColor: Colors.border,
-  },
-  goalText: { ...Typography.body, color: Colors.textPrimary, flex: 1 },
-  completedNote: { ...Typography.bodySmall, color: Colors.accent, marginTop: Spacing.sm, fontWeight: '500' },
-  emptyHint: { ...Typography.bodySmall, color: Colors.textSecondary, paddingVertical: Spacing.xs },
-  emptyCard: { alignItems: 'center', paddingVertical: Spacing.sm },
-
-  // Menu items
-  menuItem: {
-    flexDirection: 'row', alignItems: 'center', paddingVertical: Spacing.sm,
-    borderTopWidth: 1, borderTopColor: Colors.border,
-  },
-  menuIcon: { fontSize: 18, marginRight: Spacing.sm },
-  menuText: { ...Typography.body, color: Colors.textPrimary, flex: 1 },
-  menuArrow: { fontSize: 20, color: Colors.textDisabled, marginLeft: Spacing.sm },
-
-  // Progress
-  progressRow: {
-    flexDirection: 'row', alignItems: 'center', paddingVertical: Spacing.sm,
-    borderTopWidth: 1, borderTopColor: Colors.border, gap: Spacing.sm,
-  },
-  progressName: { ...Typography.label, color: Colors.textPrimary },
-  progressMeta: { ...Typography.caption, color: Colors.textSecondary, marginTop: 2 },
-  progressStat: { ...Typography.caption, color: Colors.textSecondary },
-  progressBest: { ...Typography.caption, color: Colors.primary, fontWeight: '600', marginTop: 2 },
-});

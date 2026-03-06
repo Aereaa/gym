@@ -6,22 +6,58 @@ import {
 import { alert } from '../utils/alert';
 import { useUserData } from '../contexts/UserDataContext';
 import { Goal } from '../data/types';
-import { Colors, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
+import { useTheme, Typography, Spacing, BorderRadius, PageContainer } from '../theme';
+import type { ThemeColors } from '../theme';
 
 function GoalItem({
   goal,
   onToggle,
   onDelete,
+  C,
 }: {
   goal: Goal;
   onToggle: () => void;
   onDelete: () => void;
+  C: ThemeColors;
 }) {
+  const styles = React.useMemo(() => StyleSheet.create({
+    goalCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: C.surface,
+      borderRadius: BorderRadius.md,
+      padding: Spacing.md,
+      marginBottom: Spacing.sm,
+      borderWidth: 1,
+      borderColor: C.border,
+    },
+    goalCardDone: { opacity: 0.6 },
+    checkbox: { marginRight: Spacing.md },
+    checkboxInner: {
+      width: 26,
+      height: 26,
+      borderRadius: 13,
+      borderWidth: 2,
+      borderColor: C.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    checkboxChecked: {
+      backgroundColor: C.accent,
+      borderColor: C.accent,
+    },
+    checkmark: { color: '#fff', fontSize: 14, fontWeight: '700' },
+    goalTitle: { ...Typography.body, color: C.textPrimary, flex: 1 },
+    goalTitleDone: { textDecorationLine: 'line-through', color: C.textSecondary },
+    deleteBtn: { padding: Spacing.xs, marginLeft: Spacing.sm },
+    deleteIcon: { fontSize: 14, color: C.textDisabled },
+  }), [C]);
+
   return (
     <View style={[styles.goalCard, goal.completed && styles.goalCardDone]}>
       <TouchableOpacity style={styles.checkbox} onPress={onToggle}>
         <View style={[styles.checkboxInner, goal.completed && styles.checkboxChecked]}>
-          {goal.completed && <Text style={styles.checkmark}>✓</Text>}
+          {goal.completed && <Text style={styles.checkmark}>{'\u2713'}</Text>}
         </View>
       </TouchableOpacity>
 
@@ -33,13 +69,14 @@ function GoalItem({
       </Text>
 
       <TouchableOpacity onPress={onDelete} style={styles.deleteBtn}>
-        <Text style={styles.deleteIcon}>✕</Text>
+        <Text style={styles.deleteIcon}>{'\u2715'}</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
 export default function GoalsScreen() {
+  const { colors: C } = useTheme();
   const { goals, addGoal, toggleGoal, deleteGoal } = useUserData();
   const [text, setText] = useState('');
 
@@ -60,6 +97,63 @@ export default function GoalsScreen() {
     ]);
   }
 
+  const styles = React.useMemo(() => StyleSheet.create({
+    container: { flex: 1, backgroundColor: C.background },
+    header: {
+      ...PageContainer,
+      paddingHorizontal: Spacing.md,
+      paddingTop: Spacing.lg,
+      paddingBottom: Spacing.md,
+    },
+    title: { ...Typography.h2, color: C.textPrimary },
+    subtitle: { ...Typography.bodySmall, color: C.textSecondary, marginTop: 4 },
+    addRow: {
+      ...PageContainer,
+      flexDirection: 'row',
+      paddingHorizontal: Spacing.md,
+      marginBottom: Spacing.md,
+      gap: Spacing.sm,
+    },
+    input: {
+      flex: 1,
+      backgroundColor: C.surface,
+      borderWidth: 1,
+      borderColor: C.border,
+      borderRadius: BorderRadius.md,
+      paddingHorizontal: Spacing.md,
+      height: 52,
+      ...Typography.body,
+      color: C.textPrimary,
+    },
+    addBtn: {
+      backgroundColor: C.primary,
+      borderRadius: 12,
+      paddingHorizontal: Spacing.md,
+      justifyContent: 'center',
+      height: 52,
+      shadowColor: C.glow,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.5,
+      shadowRadius: 12,
+      elevation: 6,
+    },
+    addBtnDisabled: { opacity: 0.4 },
+    addBtnText: { ...Typography.button, color: C.textOnPrimary },
+    list: { ...PageContainer, paddingHorizontal: Spacing.md, paddingBottom: Spacing.xxl },
+    sectionLabel: {
+      ...Typography.label,
+      color: C.textSecondary,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+      marginTop: Spacing.md,
+      marginBottom: Spacing.sm,
+    },
+    empty: { alignItems: 'center', marginTop: Spacing.xxl },
+    emptyEmoji: { fontSize: 48, marginBottom: Spacing.md },
+    emptyText: { ...Typography.h3, color: C.textPrimary, marginBottom: Spacing.sm },
+    emptySubtext: { ...Typography.body, color: C.textSecondary, textAlign: 'center', maxWidth: 280 },
+  }), [C]);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -73,8 +167,8 @@ export default function GoalsScreen() {
           style={styles.input}
           value={text}
           onChangeText={setText}
-          placeholder="Add a goal — e.g. Squat 80 kg"
-          placeholderTextColor={Colors.textDisabled}
+          placeholder="Add a goal \u2014 e.g. Squat 80 kg"
+          placeholderTextColor={C.textDisabled}
           onSubmitEditing={handleAdd}
           returnKeyType="done"
         />
@@ -98,10 +192,10 @@ export default function GoalsScreen() {
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Text style={styles.emptyEmoji}>🎯</Text>
+            <Text style={styles.emptyEmoji}>{'\u{1F3AF}'}</Text>
             <Text style={styles.emptyText}>No goals yet</Text>
             <Text style={styles.emptySubtext}>
-              Add your first goal above — big or small, any goal counts.
+              Add your first goal above {'\u2014'} big or small, any goal counts.
             </Text>
           </View>
         }
@@ -115,6 +209,7 @@ export default function GoalsScreen() {
               goal={goal}
               onToggle={() => toggleGoal(goal.id)}
               onDelete={() => handleDelete(goal)}
+              C={C}
             />
           );
         }}
@@ -122,85 +217,3 @@ export default function GoalsScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
-  header: {
-    ...PageContainer,
-    paddingHorizontal: Spacing.md,
-    paddingTop: Spacing.lg,
-    paddingBottom: Spacing.md,
-  },
-  title: { ...Typography.h2, color: Colors.textPrimary },
-  subtitle: { ...Typography.bodySmall, color: Colors.textSecondary, marginTop: 4 },
-  addRow: {
-    ...PageContainer,
-    flexDirection: 'row',
-    paddingHorizontal: Spacing.md,
-    marginBottom: Spacing.md,
-    gap: Spacing.sm,
-  },
-  input: {
-    flex: 1,
-    backgroundColor: Colors.surface,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: BorderRadius.md,
-    paddingHorizontal: Spacing.md,
-    height: 48,
-    ...Typography.body,
-    color: Colors.textPrimary,
-  },
-  addBtn: {
-    backgroundColor: Colors.primary,
-    borderRadius: BorderRadius.md,
-    paddingHorizontal: Spacing.md,
-    justifyContent: 'center',
-    height: 48,
-  },
-  addBtnDisabled: { opacity: 0.4 },
-  addBtnText: { ...Typography.button, color: Colors.textOnPrimary },
-  list: { ...PageContainer, paddingHorizontal: Spacing.md, paddingBottom: Spacing.xxl },
-  sectionLabel: {
-    ...Typography.label,
-    color: Colors.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginTop: Spacing.md,
-    marginBottom: Spacing.sm,
-  },
-  goalCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    marginBottom: Spacing.sm,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  goalCardDone: { opacity: 0.6 },
-  checkbox: { marginRight: Spacing.md },
-  checkboxInner: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    borderWidth: 2,
-    borderColor: Colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkboxChecked: {
-    backgroundColor: Colors.accent,
-    borderColor: Colors.accent,
-  },
-  checkmark: { color: '#fff', fontSize: 14, fontWeight: '700' },
-  goalTitle: { ...Typography.body, color: Colors.textPrimary, flex: 1 },
-  goalTitleDone: { textDecorationLine: 'line-through', color: Colors.textSecondary },
-  deleteBtn: { padding: Spacing.xs, marginLeft: Spacing.sm },
-  deleteIcon: { fontSize: 14, color: Colors.textDisabled },
-  empty: { alignItems: 'center', marginTop: Spacing.xxl },
-  emptyEmoji: { fontSize: 48, marginBottom: Spacing.md },
-  emptyText: { ...Typography.h3, color: Colors.textPrimary, marginBottom: Spacing.sm },
-  emptySubtext: { ...Typography.body, color: Colors.textSecondary, textAlign: 'center', maxWidth: 280 },
-});

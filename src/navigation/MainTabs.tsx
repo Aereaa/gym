@@ -6,7 +6,7 @@ import ExploreStack from './ExploreStack';
 import SearchStack from './SearchStack';
 import MascotScreen from '../screens/MascotScreen';
 import ProfileStack from './ProfileStack';
-import { Colors } from '../theme';
+import { useTheme } from '../theme';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -26,16 +26,18 @@ function TabIcon({ label, focused }: { label: string; focused: boolean }) {
 }
 
 export default function MainTabs() {
+  const { colors: C } = useTheme();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarIcon: ({ focused }) => <TabIcon label={route.name} focused={focused} />,
-        tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.textSecondary,
+        tabBarActiveTintColor: C.primary,
+        tabBarInactiveTintColor: C.textSecondary,
         tabBarStyle: {
-          backgroundColor: Colors.surface,
-          borderTopColor: Colors.border,
+          backgroundColor: C.surface,
+          borderTopColor: C.border,
           paddingBottom: 4,
           height: 60,
         },
