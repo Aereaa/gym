@@ -17,11 +17,11 @@ const MOOD_COLORS = {
 } as const;
 
 const PHASE_COLORS = {
-  baby: '#93C5FD',
-  junior: '#60A5FA',
-  sportovec: '#2563EB',
-  sampion: '#F59E0B',
-  legenda: '#A855F7',
+  baby: '#3B82F6',
+  junior: '#2563EB',
+  sportovec: '#1D4ED8',
+  sampion: '#D97706',
+  legenda: '#7C3AED',
 } as const;
 
 const ACCESSORIES = [
@@ -92,8 +92,8 @@ export default function MascotScreen() {
     },
     mascotEmoji: { fontSize: 64 },
 
-    mascotName: { ...Typography.h2, color: C.textPrimary, textAlign: 'center' },
-    tapToEdit: { ...Typography.caption, color: C.textDisabled, textAlign: 'center', marginTop: 2 },
+    mascotName: { ...Typography.h2, color: '#2D2D3F', textAlign: 'center' },
+    tapToEdit: { ...Typography.caption, color: C.textSecondary, textAlign: 'center', marginTop: 2 },
 
     nameEditRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, marginBottom: Spacing.sm },
     nameInput: {
